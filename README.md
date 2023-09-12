@@ -1,2 +1,1 @@
-# CGTM
-Code Generation Template Marketplace
+# Code Generation Template Marketplace
