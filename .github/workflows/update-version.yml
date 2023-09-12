@@ -1,0 +1,32 @@
+name: Update Version
+
+on:
+  push:
+    branches:
+      - master # 监听主分支代码提交事件
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Update version
+        run: |
+          # 读取当前版本号
+          current_version=$(cat VERSION)
+          
+          # 将版本号加1
+          new_version=$((current_version + 1))
+          
+          # 更新版本号到文件
+          echo $new_version > VERSION
+
+      - name: Commit changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit -m "Update version" -a
+          git push origin master
