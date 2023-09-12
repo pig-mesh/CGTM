@@ -1,0 +1,21 @@
+name: Sync Remote Repository
+
+on:
+  push:
+    branches:
+      - master 
+      - jdk_17
+
+jobs:
+  sync-repo:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: yesolutions/mirror-action@master
+        with:
+          REMOTE: 'https://git.pig4cloud.com/pig/CGTM.git'
+          GIT_USERNAME: lengleng
+          GIT_PASSWORD: ${{ secrets.GIT_GOGS_PASSWORD }}
