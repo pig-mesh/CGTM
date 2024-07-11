@@ -1,1 +1,68 @@
-package ${package}.${moduleName}.entity;\n\nimport com.baomidou.mybatisplus.annotation.*;\nimport com.baomidou.mybatisplus.extension.activerecord.Model;\nimport io.swagger.v3.oas.annotations.media.Schema;\nimport lombok.Data;\nimport lombok.EqualsAndHashCode;\n#if($isTenant)\nimport com.pig4cloud.pigx.common.core.util.TenantTable;\n#end\n#foreach($import in $importList)\nimport $import;\n#end\n#if($ChildClassName)\nimport com.alibaba.excel.annotation.ExcelIgnore;\nimport com.github.yulichang.annotation.EntityMapping;\nimport java.util.List;\n#end\n\n/**\n * ${tableComment}\n *\n * @author ${author}\n * @date ${datetime}\n */\n@Data\n#if($isTenant)\n@TenantTable\n#end\n@TableName("${tableName}")\n@EqualsAndHashCode(callSuper = true)\n@Schema(description = "${tableComment}")\npublic class ${ClassName}Entity extends Model<${ClassName}Entity> {\n\n#foreach ($field in $fieldList)\n#if(${field.fieldComment})#set($comment=${field.fieldComment})#else #set($comment=${field.attrName})#end\n\n\t/**\n\t* $comment\n\t*/\n#if($field.primaryPk == '1')\n    @TableId(type = IdType.ASSIGN_ID)\n#end\n#if($field.autoFill == 'INSERT')\n\t@TableField(fill = FieldFill.INSERT)\n#elseif($field.autoFill == 'INSERT_UPDATE')\n\t@TableField(fill = FieldFill.INSERT_UPDATE)\n#elseif($field.autoFill == 'UPDATE')\n\t@TableField(fill = FieldFill.UPDATE)\n#end\n#if($field.fieldName == 'del_flag')\n    @TableLogic\n\t@TableField(fill = FieldFill.INSERT)\n#end\n    @Schema(description="$comment"#if($field.hidden),hidden=$field.hidden#end)\n#if($field.formType == 'checkbox')\n    private ${field.attrType}[] $field.attrName;\n#else\n    private $field.attrType $field.attrName;\n#end    \n#end\n#if($ChildClassName)\n    @ExcelIgnore\n    @TableField(exist = false)\n    @EntityMapping(thisField = "$mainField", joinField = "$childField")\n    private List<${ChildClassName}Entity> ${childClassName}List;\n#end\n}
+package ${package}.${moduleName}.entity;
+
+import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+#if($isTenant)
+import com.pig4cloud.pigx.common.core.util.TenantTable;
+#end
+#foreach($import in $importList)
+import $import;
+#end
+#if($ChildClassName)
+import com.alibaba.excel.annotation.ExcelIgnore;
+import com.github.yulichang.annotation.EntityMapping;
+import java.util.List;
+#end
+
+/**
+ * ${tableComment}
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+@Data
+#if($isTenant)
+@TenantTable
+#end
+@TableName("${tableName}")
+@EqualsAndHashCode(callSuper = true)
+@Schema(description = "${tableComment}")
+public class ${ClassName}Entity extends Model<${ClassName}Entity> {
+
+#foreach ($field in $fieldList)
+#if(${field.fieldComment})#set($comment=${field.fieldComment})#else #set($comment=${field.attrName})#end
+
+	/**
+	* $comment
+	*/
+#if($field.primaryPk == '1')
+    @TableId(type = IdType.ASSIGN_ID)
+#end
+#if($field.autoFill == 'INSERT')
+	@TableField(fill = FieldFill.INSERT)
+#elseif($field.autoFill == 'INSERT_UPDATE')
+	@TableField(fill = FieldFill.INSERT_UPDATE)
+#elseif($field.autoFill == 'UPDATE')
+	@TableField(fill = FieldFill.UPDATE)
+#end
+#if($field.fieldName == 'del_flag')
+    @TableLogic
+	@TableField(fill = FieldFill.INSERT)
+#end
+    @Schema(description="$comment"#if($field.hidden),hidden=$field.hidden#end)
+#if($field.formType == 'checkbox')
+    private ${field.attrType}[] $field.attrName;
+#else
+    private $field.attrType $field.attrName;
+#end    
+#end
+#if($ChildClassName)
+    @ExcelIgnore
+    @TableField(exist = false)
+    @EntityMapping(thisField = "$mainField", joinField = "$childField")
+    private List<${ChildClassName}Entity> ${childClassName}List;
+#end
+}

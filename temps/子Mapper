@@ -1,1 +1,18 @@
-package ${package}.${moduleName}.mapper;\n\nimport com.pig4cloud.pigx.common.data.datascope.PigxBaseMapper;\n#if($ChildClassName)\nimport ${package}.${moduleName}.entity.${ChildClassName}Entity;\n#else\nimport ${package}.${moduleName}.entity.${ClassName}Entity;\n#end\nimport org.apache.ibatis.annotations.Mapper;\n\n@Mapper\n#if($ChildClassName)\npublic interface ${ChildClassName}Mapper extends PigxBaseMapper<${ChildClassName}Entity> {\n#else\npublic interface ${ClassName}Mapper extends PigxBaseMapper<${ClassName}Entity> {\n#end\n\n}
+package ${package}.${moduleName}.mapper;
+
+import com.pig4cloud.pigx.common.data.datascope.PigxBaseMapper;
+#if($ChildClassName)
+import ${package}.${moduleName}.entity.${ChildClassName}Entity;
+#else
+import ${package}.${moduleName}.entity.${ClassName}Entity;
+#end
+import org.apache.ibatis.annotations.Mapper;
+
+@Mapper
+#if($ChildClassName)
+public interface ${ChildClassName}Mapper extends PigxBaseMapper<${ChildClassName}Entity> {
+#else
+public interface ${ClassName}Mapper extends PigxBaseMapper<${ClassName}Entity> {
+#end
+
+}

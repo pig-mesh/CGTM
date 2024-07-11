@@ -1,1 +1,15 @@
-<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">\n\n<mapper namespace="${package}.${moduleName}.mapper.${ClassName}Mapper">\n\n  <resultMap id="${className}Map" type="${package}.${moduleName}.entity.${ClassName}Entity">\n#foreach ($field in $fieldList)\n\t    #if($field.primaryPk == '1')\n        <id property="$field.attrName" column="$field.fieldName"/>\n      #else\n        <result property="$field.attrName" column="$field.fieldName"/>\n      #end\n#end\n  </resultMap>\n</mapper>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="${package}.${moduleName}.mapper.${ClassName}Mapper">
+
+  <resultMap id="${className}Map" type="${package}.${moduleName}.entity.${ClassName}Entity">
+#foreach ($field in $fieldList)
+	    #if($field.primaryPk == '1')
+        <id property="$field.attrName" column="$field.fieldName"/>
+      #else
+        <result property="$field.attrName" column="$field.fieldName"/>
+      #end
+#end
+  </resultMap>
+</mapper>

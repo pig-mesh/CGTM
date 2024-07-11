@@ -1,1 +1,12 @@
-export default {\n   ${functionName}: {\n        index: '#',\n        import${className}Tip: 'import ${ClassName}',\n#foreach($field in $fieldList)\n        ${field.attrName}: '${field.attrName}',\n#end\n#foreach($field in $fieldList)\n        input$str.pascalCase(${field.attrName})Tip: 'input ${field.attrName}',\n#end\n    }\n}
+export default {
+   ${functionName}: {
+        index: '#',
+        import${className}Tip: 'import ${ClassName}',
+#foreach($field in $fieldList)
+        ${field.attrName}: '${field.attrName}',
+#end
+#foreach($field in $fieldList)
+        input$str.pascalCase(${field.attrName})Tip: 'input ${field.attrName}',
+#end
+    }
+}

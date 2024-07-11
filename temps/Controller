@@ -1,1 +1,154 @@
-package ${package}.${moduleName}.controller;\n\n#if($queryList)\nimport cn.hutool.core.util.StrUtil;\n#end\nimport cn.hutool.core.util.ArrayUtil;\nimport cn.hutool.core.collection.CollUtil;\nimport com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;\nimport com.baomidou.mybatisplus.core.toolkit.Wrappers;\nimport com.baomidou.mybatisplus.extension.plugins.pagination.Page;\nimport com.pig4cloud.pigx.common.core.util.R;\nimport com.pig4cloud.pigx.common.log.annotation.SysLog;\nimport ${package}.${moduleName}.entity.${ClassName}Entity;\nimport ${package}.${moduleName}.service.${ClassName}Service;\nimport org.springframework.security.access.prepost.PreAuthorize;\nimport com.pig4cloud.pigx.common.excel.annotation.ResponseExcel;\nimport io.swagger.v3.oas.annotations.security.SecurityRequirement;\n#if($isSpringBoot3)\nimport org.springdoc.core.annotations.ParameterObject;\n#else\nimport org.springdoc.api.annotations.ParameterObject;\n#end\nimport org.springframework.http.HttpHeaders;\nimport io.swagger.v3.oas.annotations.tags.Tag;\nimport io.swagger.v3.oas.annotations.Operation;\nimport lombok.RequiredArgsConstructor;\nimport org.springframework.web.bind.annotation.*;\n\nimport java.util.List;\nimport java.util.Objects;\n\n/**\n * ${tableComment}\n *\n * @author ${author}\n * @date ${datetime}\n */\n@RestController\n@RequiredArgsConstructor\n@RequestMapping("/${functionName}" )\n@Tag(description = "${functionName}" , name = "${tableComment}管理" )\n@SecurityRequirement(name = HttpHeaders.AUTHORIZATION)\npublic class ${ClassName}Controller {\n\n    private final  ${ClassName}Service ${className}Service;\n\n    /**\n     * 分页查询\n     * @param page 分页对象\n     * @param ${className} ${tableComment}\n     * @return\n     */\n    @Operation(summary = "分页查询" , description = "分页查询" )\n    @GetMapping("/page" )\n    @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_view')" )\n    public R get${ClassName}Page(@ParameterObject Page page, @ParameterObject ${ClassName}Entity ${className}) {\n        LambdaQueryWrapper<${ClassName}Entity> wrapper = Wrappers.lambdaQuery();\n#foreach ($field in $queryList)\n#set($getAttrName=$str.getProperty($field.attrName))\n#set($var="${className}.$getAttrName()")\n#if($field.attrType == 'String')\n#set($expression="StrUtil.isNotBlank")\n#else\n#set($expression="Objects.nonNull")\n#end\n#if($field.queryType == '=')\n\t\twrapper.eq($expression($var),${ClassName}Entity::$getAttrName,$var);\n#elseif( $field.queryType == 'like' )\n\t\twrapper.like($expression($var),${ClassName}Entity::$getAttrName,$var);\n#elseif( $field.queryType == '!-' )\n\t\twrapper.ne($expression($var),${ClassName}Entity::$getAttrName,$var);\n#elseif( $field.queryType == '>' )\n\t\twrapper.gt($expression($var),${ClassName}Entity::$getAttrName,$var);\n#elseif( $field.queryType == '<' )\n\t\twrapper.lt($expression($var),${ClassName}Entity::$getAttrName,$var);\n#elseif( $field.queryType == '>=' )\n\t\twrapper.ge($expression($var),${ClassName}Entity::$getAttrName,$var);\n#elseif( $field.queryType == '<=' )\n\t\twrapper.le($expression($var),${ClassName}Entity::$getAttrName,$var);\n#elseif( $field.queryType == 'left like' )\n\t\twrapper.likeLeft($expression($var),${ClassName}Entity::$getAttrName,$var);\n#elseif( $field.queryType == 'right like' )\n\t\twrapper.likeRight($expression($var),${ClassName}Entity::$getAttrName,$var);\n#end\n#end\n        return R.ok(${className}Service.page(page, wrapper));\n    }\n\n\n    /**\n     * 通过id查询${tableComment}\n     * @param ${pk.attrName} id\n     * @return R\n     */\n    @Operation(summary = "通过id查询" , description = "通过id查询" )\n    @GetMapping("/{${pk.attrName}}" )\n    @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_view')" )\n    public R getById(@PathVariable("${pk.attrName}" ) ${pk.attrType} ${pk.attrName}) {\n        return R.ok(${className}Service.getById(${pk.attrName}));\n    }\n\n    /**\n     * 新增${tableComment}\n     * @param ${className} ${tableComment}\n     * @return R\n     */\n    @Operation(summary = "新增${tableComment}" , description = "新增${tableComment}" )\n    @SysLog("新增${tableComment}" )\n    @PostMapping\n    @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_add')" )\n    public R save(@RequestBody ${ClassName}Entity ${className}) {\n        return R.ok(${className}Service.save(${className}));\n    }\n\n    /**\n     * 修改${tableComment}\n     * @param ${className} ${tableComment}\n     * @return R\n     */\n    @Operation(summary = "修改${tableComment}" , description = "修改${tableComment}" )\n    @SysLog("修改${tableComment}" )\n    @PutMapping\n    @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_edit')" )\n    public R updateById(@RequestBody ${ClassName}Entity ${className}) {\n        return R.ok(${className}Service.updateById(${className}));\n    }\n\n    /**\n     * 通过id删除${tableComment}\n     * @param ids ${pk.attrName}列表\n     * @return R\n     */\n    @Operation(summary = "通过id删除${tableComment}" , description = "通过id删除${tableComment}" )\n    @SysLog("通过id删除${tableComment}" )\n    @DeleteMapping\n    @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_del')" )\n    public R removeById(@RequestBody ${pk.attrType}[] ids) {\n        return R.ok(${className}Service.removeBatchByIds(CollUtil.toList(ids)));\n    }\n\n\n    /**\n     * 导出excel 表格\n     * @param ${className} 查询条件\n   \t * @param ids 导出指定ID\n     * @return excel 文件流\n     */\n    @ResponseExcel\n    @GetMapping("/export")\n    @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_export')" )\n    public List<${ClassName}Entity> export(${ClassName}Entity ${className},${pk.attrType}[] ids) {\n        return ${className}Service.list(Wrappers.lambdaQuery(${className}).in(ArrayUtil.isNotEmpty(ids), ${ClassName}Entity::$str.getProperty($pk.attrName), ids));\n    }\n}
+package ${package}.${moduleName}.controller;
+
+#if($queryList)
+import cn.hutool.core.util.StrUtil;
+#end
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.collection.CollUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.pig4cloud.pigx.common.core.util.R;
+import com.pig4cloud.pigx.common.log.annotation.SysLog;
+import ${package}.${moduleName}.entity.${ClassName}Entity;
+import ${package}.${moduleName}.service.${ClassName}Service;
+import org.springframework.security.access.prepost.PreAuthorize;
+import com.pig4cloud.pigx.common.excel.annotation.ResponseExcel;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+#if($isSpringBoot3)
+import org.springdoc.core.annotations.ParameterObject;
+#else
+import org.springdoc.api.annotations.ParameterObject;
+#end
+import org.springframework.http.HttpHeaders;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Objects;
+
+/**
+ * ${tableComment}
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/${functionName}" )
+@Tag(description = "${functionName}" , name = "${tableComment}管理" )
+@SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+public class ${ClassName}Controller {
+
+    private final  ${ClassName}Service ${className}Service;
+
+    /**
+     * 分页查询
+     * @param page 分页对象
+     * @param ${className} ${tableComment}
+     * @return
+     */
+    @Operation(summary = "分页查询" , description = "分页查询" )
+    @GetMapping("/page" )
+    @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_view')" )
+    public R get${ClassName}Page(@ParameterObject Page page, @ParameterObject ${ClassName}Entity ${className}) {
+        LambdaQueryWrapper<${ClassName}Entity> wrapper = Wrappers.lambdaQuery();
+#foreach ($field in $queryList)
+#set($getAttrName=$str.getProperty($field.attrName))
+#set($var="${className}.$getAttrName()")
+#if($field.attrType == 'String')
+#set($expression="StrUtil.isNotBlank")
+#else
+#set($expression="Objects.nonNull")
+#end
+#if($field.queryType == '=')
+		wrapper.eq($expression($var),${ClassName}Entity::$getAttrName,$var);
+#elseif( $field.queryType == 'like' )
+		wrapper.like($expression($var),${ClassName}Entity::$getAttrName,$var);
+#elseif( $field.queryType == '!-' )
+		wrapper.ne($expression($var),${ClassName}Entity::$getAttrName,$var);
+#elseif( $field.queryType == '>' )
+		wrapper.gt($expression($var),${ClassName}Entity::$getAttrName,$var);
+#elseif( $field.queryType == '<' )
+		wrapper.lt($expression($var),${ClassName}Entity::$getAttrName,$var);
+#elseif( $field.queryType == '>=' )
+		wrapper.ge($expression($var),${ClassName}Entity::$getAttrName,$var);
+#elseif( $field.queryType == '<=' )
+		wrapper.le($expression($var),${ClassName}Entity::$getAttrName,$var);
+#elseif( $field.queryType == 'left like' )
+		wrapper.likeLeft($expression($var),${ClassName}Entity::$getAttrName,$var);
+#elseif( $field.queryType == 'right like' )
+		wrapper.likeRight($expression($var),${ClassName}Entity::$getAttrName,$var);
+#end
+#end
+        return R.ok(${className}Service.page(page, wrapper));
+    }
+
+
+    /**
+     * 通过id查询${tableComment}
+     * @param ${pk.attrName} id
+     * @return R
+     */
+    @Operation(summary = "通过id查询" , description = "通过id查询" )
+    @GetMapping("/{${pk.attrName}}" )
+    @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_view')" )
+    public R getById(@PathVariable("${pk.attrName}" ) ${pk.attrType} ${pk.attrName}) {
+        return R.ok(${className}Service.getById(${pk.attrName}));
+    }
+
+    /**
+     * 新增${tableComment}
+     * @param ${className} ${tableComment}
+     * @return R
+     */
+    @Operation(summary = "新增${tableComment}" , description = "新增${tableComment}" )
+    @SysLog("新增${tableComment}" )
+    @PostMapping
+    @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_add')" )
+    public R save(@RequestBody ${ClassName}Entity ${className}) {
+        return R.ok(${className}Service.save(${className}));
+    }
+
+    /**
+     * 修改${tableComment}
+     * @param ${className} ${tableComment}
+     * @return R
+     */
+    @Operation(summary = "修改${tableComment}" , description = "修改${tableComment}" )
+    @SysLog("修改${tableComment}" )
+    @PutMapping
+    @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_edit')" )
+    public R updateById(@RequestBody ${ClassName}Entity ${className}) {
+        return R.ok(${className}Service.updateById(${className}));
+    }
+
+    /**
+     * 通过id删除${tableComment}
+     * @param ids ${pk.attrName}列表
+     * @return R
+     */
+    @Operation(summary = "通过id删除${tableComment}" , description = "通过id删除${tableComment}" )
+    @SysLog("通过id删除${tableComment}" )
+    @DeleteMapping
+    @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_del')" )
+    public R removeById(@RequestBody ${pk.attrType}[] ids) {
+        return R.ok(${className}Service.removeBatchByIds(CollUtil.toList(ids)));
+    }
+
+
+    /**
+     * 导出excel 表格
+     * @param ${className} 查询条件
+   	 * @param ids 导出指定ID
+     * @return excel 文件流
+     */
+    @ResponseExcel
+    @GetMapping("/export")
+    @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_export')" )
+    public List<${ClassName}Entity> export(${ClassName}Entity ${className},${pk.attrType}[] ids) {
+        return ${className}Service.list(Wrappers.lambdaQuery(${className}).in(ArrayUtil.isNotEmpty(ids), ${ClassName}Entity::$str.getProperty($pk.attrName), ids));
+    }
+}

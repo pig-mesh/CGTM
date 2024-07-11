@@ -1,1 +1,24 @@
-package ${package}.${moduleName}.service;\n\n#if($ChildClassName)\nimport com.github.yulichang.extension.mapping.base.MPJDeepService;\nimport ${package}.${moduleName}.entity.${ChildClassName}Entity;\n#else\nimport com.baomidou.mybatisplus.extension.service.IService;\n#end\nimport ${package}.${moduleName}.entity.${ClassName}Entity;\n\n#if($ChildClassName)\npublic interface ${ClassName}Service extends MPJDeepService<${ClassName}Entity> {\n    Boolean saveDeep(${ClassName}Entity ${className});\n\n    Boolean updateDeep(${ClassName}Entity ${className});\n\n    Boolean removeDeep(Long[] ids);\n\n    Boolean removeChild(Long[] ids);\n#else\npublic interface ${ClassName}Service extends IService<${ClassName}Entity> {\n#end\n\n}
+package ${package}.${moduleName}.service;
+
+#if($ChildClassName)
+import com.github.yulichang.extension.mapping.base.MPJDeepService;
+import ${package}.${moduleName}.entity.${ChildClassName}Entity;
+#else
+import com.baomidou.mybatisplus.extension.service.IService;
+#end
+import ${package}.${moduleName}.entity.${ClassName}Entity;
+
+#if($ChildClassName)
+public interface ${ClassName}Service extends MPJDeepService<${ClassName}Entity> {
+    Boolean saveDeep(${ClassName}Entity ${className});
+
+    Boolean updateDeep(${ClassName}Entity ${className});
+
+    Boolean removeDeep(Long[] ids);
+
+    Boolean removeChild(Long[] ids);
+#else
+public interface ${ClassName}Service extends IService<${ClassName}Entity> {
+#end
+
+}
