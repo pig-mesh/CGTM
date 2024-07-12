@@ -16,6 +16,6 @@ jobs:
           fetch-depth: 0
       - uses: yesolutions/mirror-action@master
         with:
-          REMOTE: 'https://git.pig4cloud.com/pig/CGTM.git'
-          GIT_USERNAME: lengleng
+          REMOTE: 'https://atomgit.com/log4j/CGTM.git'
+          GIT_USERNAME: lltx
           GIT_PASSWORD: ${{ secrets.GIT_GOGS_PASSWORD }}
