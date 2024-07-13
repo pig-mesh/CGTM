@@ -18,8 +18,24 @@ jobs:
           # 读取当前版本号
           current_version=$(cat VERSION)
           
-          # 将版本号加1
-          new_version=$((current_version + 1))
+          # 提取版本号中的年份部分和当年版本序号
+          version_year=${current_version:1:4}
+          version_number=${current_version:5:3}
+
+          # 获取当前年份
+          current_year=$(date +'%Y')
+
+          # 判断版本号年份是否是当前年份
+          if [ "$version_year" = "$current_year" ]; then
+            # 当年版本号加1
+            new_version_number=$(printf "%03d" $((10#$version_number + 1)))
+          else
+            # 如果不是当前年份，则重置为001
+            new_version_number="001"
+          fi
+
+          # 生成新的版本号
+          new_version="V${current_year}${new_version_number}"
           
           # 更新版本号到文件
           echo $new_version > VERSION
@@ -28,5 +44,5 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git commit -m "Update version" -a
+          git commit -m "Update version to $new_version" -a
           git push origin master
