@@ -1,24 +1,28 @@
 {
-    "8":{
-        "support":[
-            "52"
-        ],
-        "单表增删改查":{
-
-        },
-        "主子表表增删改查":{
-
-        }
-    },
-    "17":{
-        "support":[
-            "52"
-        ],
-        "单表增删改查":{
-
-        },
-        "主子表表增删改查":{
-
-        }
-    }
+  "单表增删改查": [
+    "temps/Controller",
+    "temps/Service",
+    "temps/ServiceImpl",
+    "temps/实体",
+    "temps/Mapper",
+    "temps/Mapper.xml",
+    "temps/权限菜单",
+    "temps/api.ts",
+    "temps/表格",
+    "temps/表单"
+  ],
+  "主子表增删改查": [
+    "temps/Service",
+    "temps/ServiceImpl",
+    "temps/实体",
+    "temps/Mapper",
+    "temps/Mapper.xml",
+    "temps/权限菜单",
+    "temps/api.ts",
+    "temps/子实体",
+    "temps/主子Contoller",
+    "temps/主子表单",
+    "temps/主子表格",
+    "temps/子Mapper"
+  ]
 }

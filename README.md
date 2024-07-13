@@ -42,7 +42,7 @@ CGTM在[AGPL 3.0 许可证](https://github.com/pig-mesh/CGTM/blob/master/LICENSE
 
 ## 支持
 
-如果您遇到任何问题或对CGTM有任何疑问，请通过[sw@pigx.top](mailto:sw@pigx.top)与我们联系。我们将提供帮助，并确保平台的正常运行。
+如果您遇到任何问题或对CGTM有任何疑问，请通过[sw@pigx.vip](mailto:sw@pigx.top)与我们联系。我们将提供帮助，并确保平台的正常运行。
 
 让我们共同合作，通过CGTM使编码更高效、更愉悦！
 
