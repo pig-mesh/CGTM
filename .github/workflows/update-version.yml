@@ -1,4 +1,4 @@
-name: Update Version
+name: update version and sync-repo
 
 on:
   push:
@@ -47,14 +47,8 @@ jobs:
           git commit -m "Update version to $new_version" -a
           git push origin master
 
-  sync-repo:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - uses: yesolutions/mirror-action@master
+      - name: sync-repo
+        uses: yesolutions/mirror-action@master
         with:
           REMOTE: 'https://git.pig4cloud.com/pig/CGTM.git'
           GIT_USERNAME: lengleng
