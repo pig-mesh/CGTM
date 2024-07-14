@@ -76,7 +76,7 @@ export function putObj(obj?: Object) {
  * 字段名: [
  *   {
  *     validator: (rule, value, callback) => {
- *       validateExist(rule, value, callback, form.id !== '');
+ *       validateExist(rule, value, callback, form.${pk.attrName} !== '');
  *     },
  *     trigger: 'blur',
  *   },

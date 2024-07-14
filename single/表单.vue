@@ -102,8 +102,8 @@
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="visible = false">取消</el-button>
-          <el-button type="primary" @click="onSubmit" :disabled="loading">确认</el-button>
+          <el-button @click="visible = false">取 消</el-button>
+          <el-button type="primary" @click="onSubmit" :disabled="loading">确 认</el-button>
         </span>
       </template>
     </el-dialog>
@@ -112,7 +112,7 @@
 <script setup lang="ts" name="${ClassName}Dialog">
 import { useDict } from '/@/hooks/dict';
 import { useMessage } from "/@/hooks/message";
-import { getObj, addObj, putObj } from '/@/api/${moduleName}/${functionName}'
+import { getObj, addObj, putObj, validateExist } from '/@/api/${moduleName}/${functionName}'
 import { rule } from '/@/utils/validate';
 const emit = defineEmits(['refresh']);
 
@@ -150,12 +150,19 @@ const form = reactive({
 // 定义校验规则
 const dataRules = ref({
 #foreach($field in $formList)
-#if($field.formRequired == '1' && $field.formValidator)
+#if($field.formRequired == '1' && $field.formValidator == 'duplicate')
+    ${field.attrName}: [{required: true, message: '${field.fieldComment}不能为空', trigger: 'blur'}, {
+      validator: (rule: any, value: any, callback: any) => {
+        validateExist(rule, value, callback, form.${pk.attrName} !== '');
+      },
+      trigger: 'blur',
+    }],
+#elseif($field.formRequired == '1' && $field.formValidator)
     ${field.attrName}: [{required: true, message: '${field.fieldComment}不能为空', trigger: 'blur'}, { validator: rule.${field.formValidator}, trigger: 'blur' }],
 #elseif($field.formRequired == '1')
-        ${field.attrName}: [{required: true, message: '${field.fieldComment}不能为空', trigger: 'blur'}],
+    ${field.attrName}: [{required: true, message: '${field.fieldComment}不能为空', trigger: 'blur'}],
 #elseif($field.formValidator)
-        ${field.attrName}: [{ validator: rule.${field.formValidator}, trigger: 'blur' }],
+    ${field.attrName}: [{ validator: rule.${field.formValidator}, trigger: 'blur' }],
 #end
 #end
 })
