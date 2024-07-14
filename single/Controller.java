@@ -4,13 +4,13 @@ package ${package}.${moduleName}.controller;
 import cn.hutool.core.util.StrUtil;
 #end
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pig4cloud.pigx.common.core.util.R;
 import com.pig4cloud.pigx.common.log.annotation.SysLog;
 import ${package}.${moduleName}.entity.${ClassName}Entity;
-import ${package}.${moduleName}.entity.${ChildClassName}Entity;
 import ${package}.${moduleName}.service.${ClassName}Service;
 import org.springframework.security.access.prepost.PreAuthorize;
 import com.pig4cloud.pigx.common.excel.annotation.ResponseExcel;
@@ -86,16 +86,17 @@ public class ${ClassName}Controller {
         return R.ok(${className}Service.page(page, wrapper));
     }
 
+
     /**
-     * 通过id查询${tableComment}
-     * @param ${pk.attrName} id
-     * @return R
+     * 通过条件查询${tableComment}
+     * @param ${className} 查询条件
+     * @return R  对象列表
      */
-    @Operation(summary = "通过id查询" , description = "通过id查询" )
-    @GetMapping("/{${pk.attrName}}" )
+    @Operation(summary = "通过条件查询" , description = "通过条件查询对象" )
+    @GetMapping("/details" )
     @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_view')" )
-    public R getById(@PathVariable("${pk.attrName}" ) ${pk.attrType} ${pk.attrName}) {
-        return R.ok(${className}Service.getByIdDeep(${pk.attrName}));
+    public R getDetails(@ParameterObject ${ClassName}Entity ${className}) {
+        return R.ok(${className}Service.list(Wrappers.query(${className})}));
     }
 
     /**
@@ -108,7 +109,7 @@ public class ${ClassName}Controller {
     @PostMapping
     @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_add')" )
     public R save(@RequestBody ${ClassName}Entity ${className}) {
-        return R.ok(${className}Service.saveDeep(${className}));
+        return R.ok(${className}Service.save(${className}));
     }
 
     /**
@@ -121,7 +122,7 @@ public class ${ClassName}Controller {
     @PutMapping
     @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_edit')" )
     public R updateById(@RequestBody ${ClassName}Entity ${className}) {
-        return R.ok(${className}Service.updateDeep(${className}));
+        return R.ok(${className}Service.updateById(${className}));
     }
 
     /**
@@ -134,21 +135,9 @@ public class ${ClassName}Controller {
     @DeleteMapping
     @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_del')" )
     public R removeById(@RequestBody ${pk.attrType}[] ids) {
-        return R.ok(${className}Service.removeDeep(ids));
+        return R.ok(${className}Service.removeBatchByIds(CollUtil.toList(ids)));
     }
 
-    /**
-     * 通过id删除${tableComment}子表数据
-     * @param ids ${pk.attrName}列表
-     * @return R
-     */
-    @Operation(summary = "通过id删除${tableComment}子表数据" , description = "通过id删除${tableComment}子表数据" )
-    @SysLog("通过id删除${tableComment}子表数据" )
-    @DeleteMapping("/child")
-    @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_del')" )
-    public R removeChild(@RequestBody ${pk.attrType}[] ids) {
-        return R.ok(${className}Service.removeChild(ids));
-    }
 
     /**
      * 导出excel 表格

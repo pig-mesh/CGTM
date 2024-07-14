@@ -5,7 +5,6 @@ import ${package}.${moduleName}.entity.${ClassName}Entity;
 import ${package}.${moduleName}.mapper.${ClassName}Mapper;
 import ${package}.${moduleName}.service.${ClassName}Service;
 import org.springframework.stereotype.Service;
-#if($ChildClassName)
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import ${package}.${moduleName}.entity.${ChildClassName}Entity;
@@ -13,7 +12,7 @@ import ${package}.${moduleName}.mapper.${ChildClassName}Mapper;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import java.util.Objects;
-#end
+
 /**
  * ${tableComment}
  *
@@ -21,11 +20,9 @@ import java.util.Objects;
  * @date ${datetime}
  */
 @Service
-#if($ChildClassName)
 @RequiredArgsConstructor
-#end
 public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${ClassName}Entity> implements ${ClassName}Service {
-#if($ChildClassName)
+
   private final ${ChildClassName}Mapper ${childClassName}Mapper;
 
     @Override
@@ -70,5 +67,4 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
         ${childClassName}Mapper.deleteBatchIds(CollUtil.toList(ids));
         return Boolean.TRUE;
     }
-#end
 }

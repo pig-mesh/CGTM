@@ -27,10 +27,9 @@
       <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else ${field.attrName}#end" prop="${field.attrName}">
             <el-radio-group v-model="state.queryForm.${field.attrName}">
       #if($field.fieldDict)
-             <el-radio :label="item.value" v-for="(item, index) in ${field.fieldDict}" border :key="index">{{ item.label }}
-            </el-radio>
+            <el-radio :label="item.value" v-for="(item, index) in ${field.fieldDict}" border :key="index">{{ item.label }}</el-radio>
        #else
-           <el-radio label="${field.fieldComment}" border>${field.fieldComment}</el-radio>
+            <el-radio label="${field.fieldComment}" border>${field.fieldComment}</el-radio>
        #end
             </el-radio-group>
      </el-form-item>

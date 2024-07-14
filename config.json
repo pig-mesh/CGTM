@@ -3,114 +3,114 @@
     {
       "templateName": "Controller",
       "generatorPath": "${backendPath}/src/main/java/${packagePath}/${moduleName}/controller/${ClassName}Controller.java",
-      "templateFile": "temps/Controller"
+      "templateFile": "single/Controller.java"
     },
     {
       "templateName": "Service",
       "generatorPath": "${backendPath}/src/main/java/${packagePath}/${moduleName}/service/${ClassName}Service.java",
-      "templateFile": "temps/Service"
+      "templateFile": "single/Service.java"
     },
     {
       "templateName": "ServiceImpl",
       "generatorPath": "${backendPath}/src/main/java/${packagePath}/${moduleName}/service/impl/${ClassName}ServiceImpl.java",
-      "templateFile": "temps/ServiceImpl"
+      "templateFile": "single/ServiceImpl.java"
     },
     {
       "templateName": "实体",
       "generatorPath": "${backendPath}/src/main/java/${packagePath}/${moduleName}/entity/${ClassName}Entity.java",
-      "templateFile": "temps/实体"
+      "templateFile": "single/实体.java"
     },
     {
       "templateName": "Mapper",
       "generatorPath": "${backendPath}/src/main/java/${packagePath}/${moduleName}/mapper/${ClassName}Mapper.java",
-      "templateFile": "temps/Mapper"
+      "templateFile": "single/Mapper.java"
     },
     {
       "templateName": "Mapper.xml",
       "generatorPath": "${backendPath}/src/main/resources/mapper/${ClassName}Mapper.xml",
-      "templateFile": "temps/Mapper.xml"
+      "templateFile": "single/Mapper.xml"
     },
     {
       "templateName": "权限菜单",
       "generatorPath": "${backendPath}/menu/${functionName}_menu.sql",
-      "templateFile": "temps/权限菜单"
+      "templateFile": "common/权限菜单.sql"
     },
     {
       "templateName": "api.ts",
       "generatorPath": "${frontendPath}/src/api/${moduleName}/${functionName}.ts",
-      "templateFile": "temps/api.ts"
+      "templateFile": "common/api.ts"
     },
     {
       "templateName": "表格",
       "generatorPath": "${frontendPath}/src/views/${moduleName}/${functionName}/index.vue",
-      "templateFile": "temps/表格"
+      "templateFile": "single/表格.vue"
     },
     {
       "templateName": "表单",
       "generatorPath": "${frontendPath}/src/views/${moduleName}/${functionName}/form.vue",
-      "templateFile": "temps/表单"
+      "templateFile": "single/表单.vue"
     }
   ],
   "主子表增删改查": [
     {
       "templateName": "Service",
       "generatorPath": "${backendPath}/src/main/java/${packagePath}/${moduleName}/service/${ClassName}Service.java",
-      "templateFile": "temps/Service"
+      "templateFile": "multiple/主子Service.java"
     },
     {
       "templateName": "ServiceImpl",
       "generatorPath": "${backendPath}/src/main/java/${packagePath}/${moduleName}/service/impl/${ClassName}ServiceImpl.java",
-      "templateFile": "temps/ServiceImpl"
+      "templateFile": "multiple/主子ServiceImpl.java"
     },
     {
-      "templateName": "实体",
+      "templateName": "主实体",
       "generatorPath": "${backendPath}/src/main/java/${packagePath}/${moduleName}/entity/${ClassName}Entity.java",
-      "templateFile": "temps/实体"
+      "templateFile": "multiple/主实体.java"
     },
     {
       "templateName": "Mapper",
       "generatorPath": "${backendPath}/src/main/java/${packagePath}/${moduleName}/mapper/${ClassName}Mapper.java",
-      "templateFile": "temps/Mapper"
+      "templateFile": "single/Mapper.java"
     },
     {
       "templateName": "Mapper.xml",
       "generatorPath": "${backendPath}/src/main/resources/mapper/${ClassName}Mapper.xml",
-      "templateFile": "temps/Mapper.xml"
+      "templateFile": "single/Mapper.xml"
     },
     {
       "templateName": "权限菜单",
       "generatorPath": "${backendPath}/menu/${functionName}_menu.sql",
-      "templateFile": "temps/权限菜单"
+      "templateFile": "common/权限菜单.sql"
     },
     {
       "templateName": "api.ts",
       "generatorPath": "${frontendPath}/src/api/${moduleName}/${functionName}.ts",
-      "templateFile": "temps/api.ts"
+      "templateFile": "common/api.ts"
     },
     {
       "templateName": "子实体",
       "generatorPath": "${backendPath}/src/main/java/${packagePath}/${moduleName}/entity/${ChildClassName}Entity.java",
-      "templateFile": "temps/子实体"
+      "templateFile": "multiple/子实体.java"
     },
     {
       "templateName": "主子Contoller",
       "generatorPath": "${backendPath}/src/main/java/${packagePath}/${moduleName}/controller/${ClassName}Controller.java",
-      "templateFile": "temps/主子Contoller"
+      "templateFile": "multiple/主子Contoller.java"
     },
     {
       "templateName": "主子表单",
       "generatorPath": "${frontendPath}/src/views/${moduleName}/${functionName}/form.vue",
-      "templateFile": "temps/主子表单"
+      "templateFile": "multiple/主子表单.vue"
     },
     {
       "templateName": "主子表格",
       "generatorPath": "${frontendPath}/src/views/${moduleName}/${functionName}/index.vue",
-      "templateFile": "temps/主子表格"
+      "templateFile": "multiple/主子表格.vue"
     },
     {
       "templateName": "子Mapper",
       "generatorPath": "${backendPath}/src/main/java/${packagePath}/${moduleName}/mapper/${ChildClassName}Mapper.java",
-      "templateFile": "temps/子Mapper"
+      "templateFile": "multiple/子Mapper.java"
     }
   ]
 }

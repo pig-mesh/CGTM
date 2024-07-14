@@ -11,11 +11,6 @@ import com.pig4cloud.pigx.common.core.util.TenantTable;
 #foreach($import in $importList)
 import $import;
 #end
-#if($ChildClassName)
-import com.alibaba.excel.annotation.ExcelIgnore;
-import com.github.yulichang.annotation.EntityMapping;
-import java.util.List;
-#end
 
 /**
  * ${tableComment}
@@ -58,11 +53,5 @@ public class ${ClassName}Entity extends Model<${ClassName}Entity> {
 #else
     private $field.attrType $field.attrName;
 #end    
-#end
-#if($ChildClassName)
-    @ExcelIgnore
-    @TableField(exist = false)
-    @EntityMapping(thisField = "$mainField", joinField = "$childField")
-    private List<${ChildClassName}Entity> ${childClassName}List;
 #end
 }

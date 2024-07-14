@@ -1,8 +1,7 @@
 <template>
-    <el-dialog :title="form.${pk.attrName} ? '编辑' : '新增'" v-model="visible"
-      :close-on-click-modal="false" draggable>
-      <el-form ref="dataFormRef" :model="form" :rules="dataRules" formDialogRef label-width="90px" v-loading="loading">
-       <el-row :gutter="24">
+  <el-drawer :title="form.${pk.attrName} ? (detail ? '详情' : '编辑') : '添加'" v-model="visible" size="50%">
+      <el-form ref="dataFormRef" :model="form" :rules="dataRules" label-width="90px" :disabled="detail" v-loading="loading">
+        <el-row :gutter="24">
 #foreach($field in $formList)
 #if($field.attrName != ${pk.attrName})
 #if($formLayout == 1)
@@ -48,7 +47,7 @@
       <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else ${field.attrName}#end" prop="${field.attrName}">
             <el-checkbox-group v-model="form.${field.attrName}">
      #if($field.fieldDict)
-						<el-checkbox :label="item.value" v-for="(item, index) in ${field.fieldDict}" :key="index">{{ item.label }}</el-checkbox>
+                <el-checkbox :label="item.value" v-for="(item, index) in ${field.fieldDict}" :key="index">{{ item.label }}</el-checkbox>
        #end
      #if(!$field.fieldDict)
                 <el-checkbox label="启用" name="type"></el-checkbox>
@@ -67,7 +66,6 @@
             <el-date-picker type="datetime" placeholder="请选择#if(${field.fieldComment})${field.fieldComment}#else ${field.attrName}#end" v-model="form.${field.attrName}" :value-format="dateTimeStr"></el-date-picker>
       </el-form-item>
       </el-col>
-
 #elseif($field.formType == 'number')
       <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else ${field.attrName}#end" prop="${field.attrName}">
         <el-input-number :min="1" :max="1000" v-model="form.${field.attrName}" placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else ${field.attrName}#end"></el-input-number>
@@ -75,21 +73,20 @@
     </el-col>
 #elseif($field.formType == 'upload-file')
   <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else ${field.attrName}#end" prop="${field.attrName}">
-    <upload-file v-model:imageUrl="form.${field.attrName}"></upload-file>
+    <upload-file  v-model="form.${field.attrName}"></upload-file>
   </el-form-item>
   </el-col>
 #elseif($field.formType == 'upload-img')
   <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else ${field.attrName}#end" prop="${field.attrName}">
-    <upload-img v-model="form.${field.attrName}"></upload-img>
+    <upload-img v-model:imageUrl="form.${field.attrName}"></upload-img>
   </el-form-item>
   </el-col>
 #elseif($field.formType == 'editor')
   <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else ${field.attrName}#end" prop="${field.attrName}">
-    <editor v-if="visible" v-model:get-html="form.${field.attrName}" placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else ${field.attrName}#end"></editor>
+    <editor v-model:get-html="form.${field.attrName}" placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else ${field.attrName}#end"></editor>
   </el-form-item>
   </el-col>
 #end
-
 #if(!$field.formType)
       <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else ${field.attrName}#end" prop="${column.attrName}">
         <el-input v-model="form.${field.attrName}" placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else ${field.attrName}#end"/>
@@ -98,7 +95,31 @@
 #end
 #end
 #end
-			</el-row>
+    </el-row>
+  <el-row :gutter="24">
+    <sc-form-table
+      v-model="form.${childClassName}List"
+      :addTemplate="childTemp"
+      @delete="deleteChild"
+      placeholder="暂无数据"
+    >
+#set($ignoreColumnList = ["create_by","create_time","update_by","update_time","del_flag","tenant_id"])
+#foreach($field in $childFieldList)
+#if($field.primaryPk == '1')
+#elseif($ignoreColumnList.contains(${field.fieldName}))
+#elseif($field.attrName == $childField)
+#else  
+      <el-table-column label="${field.fieldComment}" prop="${field.attrName}">
+        <template #default="{ row, $index }">
+          <el-form-item :prop="`${childClassName}List.${$index}.${field.attrName}`" :rules="[{ required: true, trigger: 'blur' }]">
+            <el-input v-model="row.${field.attrName}" style="width: 100%" />
+          </el-form-item>
+        </template>
+      </el-table-column>
+#end
+#end
+    </sc-form-table>
+  </el-row>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
@@ -106,20 +127,23 @@
           <el-button type="primary" @click="onSubmit" :disabled="loading">确认</el-button>
         </span>
       </template>
-    </el-dialog>
+    </el-drawer>
 </template>
 
 <script setup lang="ts" name="${ClassName}Dialog">
 import { useDict } from '/@/hooks/dict';
-import { useMessage } from "/@/hooks/message";
-import { getObj, addObj, putObj } from '/@/api/${moduleName}/${functionName}'
 import { rule } from '/@/utils/validate';
+import { useMessage } from "/@/hooks/message";
+import { getObj, addObj, putObj, delChildObj } from '/@/api/${moduleName}/${functionName}'
+const scFormTable = defineAsyncComponent(() => import('/@/components/FormTable/index.vue'));
 const emit = defineEmits(['refresh']);
 
 // 定义变量内容
 const dataFormRef = ref();
-const visible = ref(false)
-const loading = ref(false)
+const visible = ref(false);
+const loading = ref(false);
+const detail = ref(false);
+
 // 定义字典
 #set($fieldDict=[])
 #foreach($field in $gridList)
@@ -145,7 +169,14 @@ const form = reactive({
 	  ${field.attrName}: '',
 #end
 #end
+	  ${childClassName}List:[],
 });
+
+const childTemp = reactive({
+  #foreach($field in $childFieldList)
+    ${field.attrName}: '',
+  #end
+})
 
 // 定义校验规则
 const dataRules = ref({
@@ -161,49 +192,63 @@ const dataRules = ref({
 })
 
 // 打开弹窗
-const openDialog = (id: string) => {
+const openDialog = (id: string, isDetail: boolean) => {
   visible.value = true
+  detail.value = isDetail
   form.${pk.attrName} = ''
 
   // 重置表单数据
-	nextTick(() => {
-		dataFormRef.value?.resetFields();
-	});
+  nextTick(() => {
+    dataFormRef.value?.resetFields();
+    form.${childClassName}List = [];
+  });
 
   // 获取${className}信息
   if (id) {
     form.${pk.attrName} = id
-    get${className}Data(id)
+    get${ClassName}Data(id)
   }
 };
 
 // 提交
 const onSubmit = async () => {
-	const valid = await dataFormRef.value.validate().catch(() => {});
-	if (!valid) return false;
+  const valid = await dataFormRef.value.validate().catch(() => {});
+  if (!valid) return false;
 
-	try {
+  try {
     loading.value = true;
-		form.${pk.attrName} ? await putObj(form) : await addObj(form);
-		useMessage().success(form.${pk.attrName} ? '修改成功' : '添加成功');
-		visible.value = false;
-		emit('refresh');
-	} catch (err: any) {
-		useMessage().error(err.msg);
-	} finally {
+    form.${pk.attrName} ? await putObj(form) : await addObj(form);
+    useMessage().success(form.${pk.attrName} ? '修改成功' : '添加成功');
+    visible.value = false;
+    emit('refresh');
+  } catch (err: any) {
+    useMessage().error(err.msg);
+  } finally {
     loading.value = false;
   }
 };
-
+#foreach ($field in $childFieldList)
+#if($field.primaryPk == '1')
+#set($childPkName=$field.attrName)
+#end
+#end
+// 删除子表数据
+const deleteChild = async (obj: { $childPkName: string }) => {
+  if (obj.$childPkName) {
+    try {
+      await delChildObj([obj.$childPkName]);
+      useMessage().success('删除成功');
+    } catch (err: any) {
+      useMessage().error(err.msg);
+    }
+  }
+};
 
 // 初始化表单数据
-const get${className}Data = (id: string) => {
+const get${ClassName}Data = (id: string) => {
   // 获取数据
-  loading.value = true
-  getObj(id).then((res: any) => {
-    Object.assign(form, res.data)
-  }).finally(() => {
-    loading.value = false
+  getObj({${pk.attrName}: id).then((res: any) => {
+    Object.assign(form, res.data[0])
   })
 };
 

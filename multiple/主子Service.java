@@ -1,14 +1,9 @@
 package ${package}.${moduleName}.service;
 
-#if($ChildClassName)
 import com.github.yulichang.extension.mapping.base.MPJDeepService;
 import ${package}.${moduleName}.entity.${ChildClassName}Entity;
-#else
-import com.baomidou.mybatisplus.extension.service.IService;
-#end
 import ${package}.${moduleName}.entity.${ClassName}Entity;
 
-#if($ChildClassName)
 public interface ${ClassName}Service extends MPJDeepService<${ClassName}Entity> {
     Boolean saveDeep(${ClassName}Entity ${className});
 
@@ -17,8 +12,4 @@ public interface ${ClassName}Service extends MPJDeepService<${ClassName}Entity> 
     Boolean removeDeep(Long[] ids);
 
     Boolean removeChild(Long[] ids);
-#else
-public interface ${ClassName}Service extends IService<${ClassName}Entity> {
-#end
-
 }

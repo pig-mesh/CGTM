@@ -1,11 +1,10 @@
 package ${package}.${moduleName}.mapper;
 
 import com.pig4cloud.pigx.common.data.datascope.PigxBaseMapper;
-import ${package}.${moduleName}.entity.${ClassName}Entity;
+import ${package}.${moduleName}.entity.${ChildClassName}Entity;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface ${ClassName}Mapper extends PigxBaseMapper<${ClassName}Entity> {
-
+public interface ${ChildClassName}Mapper extends PigxBaseMapper<${ChildClassName}Entity> {
 
 }
