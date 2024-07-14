@@ -96,7 +96,7 @@ public class ${ClassName}Controller {
     @GetMapping("/details" )
     @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_view')" )
     public R getDetails(@ParameterObject ${ClassName}Entity ${className}) {
-        return R.ok(${className}Service.listDeep(Wrappers.query(${className})}));
+        return R.ok(${className}Service.listDeep(Wrappers.query(${className})));
     }
 
     /**
