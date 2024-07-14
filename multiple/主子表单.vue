@@ -254,7 +254,7 @@ const deleteChild = async (obj: { $childPkName: string }) => {
 // 初始化表单数据
 const get${ClassName}Data = (id: string) => {
   // 获取数据
-  getObj({${pk.attrName}: id).then((res: any) => {
+  getObj({${pk.attrName}: id}).then((res: any) => {
     Object.assign(form, res.data[0])
   })
 };
