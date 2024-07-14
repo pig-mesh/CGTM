@@ -173,7 +173,7 @@ const openDialog = (id: string) => {
   // 获取${className}信息
   if (id) {
     form.${pk.attrName} = id
-    get${className}Data(id)
+    get${ClassName}Data(id)
   }
 };
 
@@ -197,7 +197,7 @@ const onSubmit = async () => {
 
 
 // 初始化表单数据
-const get${className}Data = (id: string) => {
+const get${ClassName}Data = (id: string) => {
   // 获取数据
   loading.value = true
   getObj({${pk.attrName}: id}).then((res: any) => {
