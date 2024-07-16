@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 #if($isTenant)
-import com.pig4cloud.pigx.common.core.util.TenantTable;
+import ${package}.common.core.util.TenantTable;
 #end
 #foreach($import in $importList)
 import $import;

@@ -8,12 +8,18 @@ import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pig4cloud.pigx.common.core.util.R;
-import com.pig4cloud.pigx.common.log.annotation.SysLog;
+#if($opensource)
+import ${package}.common.core.util.R;
+import ${package}.log.annotation.SysLog;
+import com.pig4cloud.plugin.excel.annotation.ResponseExcel;
+#else
+import ${package}.common.core.util.R;
+import ${package}.common.log.annotation.SysLog;
+import ${package}.common.excel.annotation.ResponseExcel;
+#end
 import ${package}.${moduleName}.entity.${ClassName}Entity;
 import ${package}.${moduleName}.service.${ClassName}Service;
 import org.springframework.security.access.prepost.PreAuthorize;
-import com.pig4cloud.pigx.common.excel.annotation.ResponseExcel;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 #if($isSpringBoot3)
 import org.springdoc.core.annotations.ParameterObject;

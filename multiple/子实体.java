@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import io.swagger.v3.oas.annotations.media.Schema;
 #if($isChildTenant)
-import com.pig4cloud.pigx.common.core.util.TenantTable;
+import ${package}.common.core.util.TenantTable;
 #end
 import lombok.Data;
 import lombok.EqualsAndHashCode;
