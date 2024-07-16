@@ -112,5 +112,17 @@
       "generatorPath": "${backendPath}/src/main/java/${packagePath}/${moduleName}/mapper/${ChildClassName}Mapper.java",
       "templateFile": "multiple/子Mapper.java"
     }
+  ],
+  "vform":[
+    {
+      "templateName": "vform.json",
+      "generatorPath": "/",
+      "templateFile": "vform/vform.json"
+    },
+    {
+      "templateName": "vform.vue",
+      "generatorPath": "/",
+      "templateFile": "vform/vform.vue"
+    }
   ]
 }
