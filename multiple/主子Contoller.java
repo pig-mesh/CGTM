@@ -7,13 +7,11 @@ import cn.hutool.core.util.ArrayUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-#if($opensource)
 import ${package}.common.core.util.R;
 import ${package}.common.log.annotation.SysLog;
+#if($opensource)
 import com.pig4cloud.plugin.excel.annotation.ResponseExcel;
 #else
-import ${package}.common.core.util.R;
-import ${package}.common.log.annotation.SysLog;
 import ${package}.common.excel.annotation.ResponseExcel;
 #end
 import ${package}.${moduleName}.entity.${ClassName}Entity;
