@@ -19,11 +19,13 @@ import ${package}.common.excel.annotation.ResponseExcel;
 #end
 import ${package}.${moduleName}.entity.${ClassName}Entity;
 import ${package}.${moduleName}.service.${ClassName}Service;
-import org.springframework.security.access.prepost.PreAuthorize;
+
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 #if($isSpringBoot3)
+import ${package}.common.security.annotation.HasPermission;
 import org.springdoc.core.annotations.ParameterObject;
 #else
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springdoc.api.annotations.ParameterObject;
 #end
 import org.springframework.http.HttpHeaders;
@@ -58,7 +60,11 @@ public class ${ClassName}Controller {
      */
     @Operation(summary = "分页查询" , description = "分页查询" )
     @GetMapping("/page" )
+    #if($isSpringBoot3)
+    @HasPermission("${moduleName}_${functionName}_view")
+    #else
     @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_view')" )
+    #end
     public R get${ClassName}Page(@ParameterObject Page page, @ParameterObject ${ClassName}Entity ${className}) {
         LambdaQueryWrapper<${ClassName}Entity> wrapper = Wrappers.lambdaQuery();
 #foreach ($field in $queryList)
@@ -100,7 +106,11 @@ public class ${ClassName}Controller {
      */
     @Operation(summary = "通过条件查询" , description = "通过条件查询对象" )
     @GetMapping("/details" )
+    #if($isSpringBoot3)
+    @HasPermission("${moduleName}_${functionName}_view")
+    #else
     @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_view')" )
+    #end
     public R getDetails(@ParameterObject ${ClassName}Entity ${className}) {
         return R.ok(${className}Service.list(Wrappers.query(${className})));
     }
@@ -113,7 +123,11 @@ public class ${ClassName}Controller {
     @Operation(summary = "新增${tableComment}" , description = "新增${tableComment}" )
     @SysLog("新增${tableComment}" )
     @PostMapping
+    #if($isSpringBoot3)
+    @HasPermission("${moduleName}_${functionName}_add")
+    #else
     @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_add')" )
+    #end
     public R save(@RequestBody ${ClassName}Entity ${className}) {
         return R.ok(${className}Service.save(${className}));
     }
@@ -126,7 +140,11 @@ public class ${ClassName}Controller {
     @Operation(summary = "修改${tableComment}" , description = "修改${tableComment}" )
     @SysLog("修改${tableComment}" )
     @PutMapping
+    #if($isSpringBoot3)
+    @HasPermission("${moduleName}_${functionName}_edit")
+    #else
     @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_edit')" )
+    #end
     public R updateById(@RequestBody ${ClassName}Entity ${className}) {
         return R.ok(${className}Service.updateById(${className}));
     }
@@ -139,7 +157,11 @@ public class ${ClassName}Controller {
     @Operation(summary = "通过id删除${tableComment}" , description = "通过id删除${tableComment}" )
     @SysLog("通过id删除${tableComment}" )
     @DeleteMapping
+    #if($isSpringBoot3)
+    @HasPermission("${moduleName}_${functionName}_del")
+    #else
     @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_del')" )
+    #end
     public R removeById(@RequestBody ${pk.attrType}[] ids) {
         return R.ok(${className}Service.removeBatchByIds(CollUtil.toList(ids)));
     }
@@ -153,7 +175,11 @@ public class ${ClassName}Controller {
      */
     @ResponseExcel
     @GetMapping("/export")
+    #if($isSpringBoot3)
+    @HasPermission("${moduleName}_${functionName}_export")
+    #else
     @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_export')" )
+    #end
     public List<${ClassName}Entity> export(${ClassName}Entity ${className},${pk.attrType}[] ids) {
         return ${className}Service.list(Wrappers.lambdaQuery(${className}).in(ArrayUtil.isNotEmpty(ids), ${ClassName}Entity::$str.getProperty($pk.attrName), ids));
     }
