@@ -42,9 +42,9 @@
 #end
           <el-form-item>
             <el-button icon="search" type="primary" @click="getDataList">
-              查询
+              查 询
             </el-button>
-            <el-button icon="Refresh" @click="resetQuery">重置</el-button>
+            <el-button icon="Refresh" @click="resetQuery">重 置</el-button>
           </el-form-item>
         </el-form>
       </el-row>
@@ -55,9 +55,12 @@
             v-auth="'${moduleName}_${functionName}_add'">
             新 增
           </el-button>
+          <el-button plain icon="upload-filled" type="primary" class="ml10" @click="excelUploadRef.show()" v-auth="'sys_user_add'">
+						导 入
+					</el-button>
           <el-button plain :disabled="multiple" icon="Delete" type="primary"
             v-auth="'${moduleName}_${functionName}_del'" @click="handleDelete(selectObjs)">
-            删除
+            删 除
           </el-button>
           <right-toolbar v-model:showSearch="showSearch" :export="'${moduleName}_${functionName}_export'"
                 @exportExcel="exportExcel" class="ml10 mr20" style="float: right;"
@@ -95,6 +98,14 @@
     <!-- 编辑、新增  -->
     <form-dialog ref="formDialogRef" @refresh="getDataList(false)" />
 
+    <!-- 导入excel -->
+    <upload-excel
+			ref="excelUploadRef"
+			title="导入"
+			url="/${moduleName}/${functionName}/import"
+			temp-url="/${moduleName}/${functionName}/export.xlsx?$pk.attrName=-1"
+			@refreshDataList="getDataList"
+		/>
   </div>
 </template>
 
@@ -124,6 +135,7 @@ const { $dict.format($fieldDict) } = useDict($dict.quotation($fieldDict))
 #end
 // 定义变量内容
 const formDialogRef = ref()
+const excelUploadRef = ref();
 // 搜索变量
 const queryRef = ref()
 const showSearch = ref(true)

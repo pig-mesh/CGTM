@@ -195,4 +195,20 @@ public class ${ClassName}Controller {
     #end    public List<${ClassName}Entity> export(${ClassName}Entity ${className},${pk.attrType}[] ids) {
         return ${className}Service.list(Wrappers.lambdaQuery(${className}).in(ArrayUtil.isNotEmpty(ids), ${ClassName}Entity::$str.getProperty($pk.attrName), ids));
     }
+
+    /**
+     * 导入excel 表
+     * @param ${className}List 对象实体列表
+     * @param bindingResult 错误信息列表
+     * @return ok fail
+     */
+    @PostMapping("/import")
+    #if($isSpringBoot3)
+    @HasPermission("${moduleName}_${functionName}_export")
+    #else
+    @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_export')" )
+    #end
+    public R import(@RequestExcel List<DemoEntity> ${className}List, BindingResult bindingResult) {
+        return R.ok( ${className}Service.saveBatch(${className}List));
+    }
 }
