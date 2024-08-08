@@ -196,7 +196,7 @@ public class ${ClassName}Controller {
     #else
     @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_export')" )
     #end
-    public List<${ClassName}Entity> export(${ClassName}Entity ${className},${pk.attrType}[] ids) {
+    public List<${ClassName}Entity> exportExcel(${ClassName}Entity ${className},${pk.attrType}[] ids) {
         return ${className}Service.list(Wrappers.lambdaQuery(${className}).in(ArrayUtil.isNotEmpty(ids), ${ClassName}Entity::$str.getProperty($pk.attrName), ids));
     }
 
@@ -212,7 +212,7 @@ public class ${ClassName}Controller {
     #else
     @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_export')" )
     #end
-    public R import(@RequestExcel List<${ClassName}Entity> ${className}List, BindingResult bindingResult) {
+    public R importExcel(@RequestExcel List<${ClassName}Entity> ${className}List, BindingResult bindingResult) {
         return R.ok(${className}Service.saveBatch(${className}List));
     }
 }
