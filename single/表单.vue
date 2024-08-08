@@ -75,12 +75,12 @@
     </el-col>
 #elseif($field.formType == 'upload-file')
   <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else ${field.attrName}#end" prop="${field.attrName}">
-    <upload-file v-model:imageUrl="form.${field.attrName}"></upload-file>
+    <upload-file v-model="form.${field.attrName}"></upload-file>
   </el-form-item>
   </el-col>
 #elseif($field.formType == 'upload-img')
   <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else ${field.attrName}#end" prop="${field.attrName}">
-    <upload-img v-model="form.${field.attrName}"></upload-img>
+    <upload-img v-model:imageUrl="form.${field.attrName}"></upload-img>
   </el-form-item>
   </el-col>
 #elseif($field.formType == 'editor')
