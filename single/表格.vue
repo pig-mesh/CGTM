@@ -103,7 +103,7 @@
 			ref="excelUploadRef"
 			title="导入"
 			url="/${moduleName}/${functionName}/import"
-      temp-url="/admin/sys-file/local/file/模板.xlsx"
+      temp-url="/admin/sys-file/local/file/${functionName}.xlsx"
 			@refreshDataList="getDataList"
 		/>
   </div>
