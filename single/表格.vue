@@ -98,12 +98,12 @@
     <!-- 编辑、新增  -->
     <form-dialog ref="formDialogRef" @refresh="getDataList(false)" />
 
-    <!-- 导入excel -->
+    <!-- 导入excel (需要在 upms-biz/resources/file 下维护模板) -->
     <upload-excel
 			ref="excelUploadRef"
 			title="导入"
 			url="/${moduleName}/${functionName}/import"
-			temp-url="/${moduleName}/${functionName}/export.xlsx?$pk.attrName=-1"
+      temp-url="/admin/sys-file/local/file/模板.xlsx"
 			@refreshDataList="getDataList"
 		/>
   </div>

@@ -12,8 +12,10 @@ import ${package}.common.core.util.R;
 import ${package}.common.log.annotation.SysLog;
 #if($opensource)
 import com.pig4cloud.plugin.excel.annotation.ResponseExcel;
+import com.pig4cloud.plugin.excel.annotation.RequestExcel;
 #else
 import ${package}.common.excel.annotation.ResponseExcel;
+import ${package}.common.excel.annotation.RequestExcel;
 #end
 import ${package}.${moduleName}.entity.${ClassName}Entity;
 import ${package}.${moduleName}.service.${ClassName}Service;
@@ -30,6 +32,7 @@ import org.springframework.http.HttpHeaders;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -194,7 +197,7 @@ public class ${ClassName}Controller {
     #else
     @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_export')" )
     #end
-    public R import(@RequestExcel List<DemoEntity> ${className}List, BindingResult bindingResult) {
-        return R.ok( ${className}Service.saveBatch(${className}List));
+    public R import(@RequestExcel List<${ClassName}Entity> ${className}List, BindingResult bindingResult) {
+        return R.ok(${className}Service.saveBatch(${className}List));
     }
 }
