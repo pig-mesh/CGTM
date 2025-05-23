@@ -219,11 +219,14 @@ const openDialog = (id: string, isDetail: boolean) => {
 
 // 提交
 const onSubmit = async () => {
+  loading.value = true; // 防止重复提交
   const valid = await dataFormRef.value.validate().catch(() => {});
-  if (!valid) return false;
+  if (!valid) {
+    loading.value = false;
+    return false;
+  }
 
   try {
-    loading.value = true;
     form.${pk.attrName} ? await putObj(form) : await addObj(form);
     useMessage().success(form.${pk.attrName} ? '修改成功' : '添加成功');
     visible.value = false;
