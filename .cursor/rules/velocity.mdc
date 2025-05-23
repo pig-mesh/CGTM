@@ -1,0 +1,100 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Velocity Templates in CGTM
+
+This rule explains how Velocity templates are used for code generation in this project.
+
+## Basic Structure
+
+Velocity templates use a simple syntax with variables, directives, and references:
+- Variables start with `$` (e.g., `$ClassName`)
+- Directives start with `#` (e.g., `#foreach`, `#if`, `#end`)
+- Comments use `##`
+
+## Entity Template Example
+
+```java
+public class ${ClassName}Entity extends Model<${ClassName}Entity> {
+
+#foreach ($field in $fieldList)
+#if($field.primaryPk)
+    @TableId(type = IdType.ASSIGN_ID)
+#end
+    @Schema(description="$comment"#if($field.hidden),hidden=$field.hidden#end)
+    private $field.attrType $field.attrName;
+#end
+}
+```
+
+## Available Context Variables
+
+### Template Basic Properties
+| Variable | Description |
+|----------|-------------|
+| dbType | Database type |
+| package | Package name |
+| packagePath | Package path |
+| version | Version |
+| moduleName | Module name |
+| ModuleName | Module name (first letter capitalized) |
+| functionName | Function name |
+| FunctionName | Function name (first letter capitalized) |
+| formLayout | Form layout |
+| style | Style, corresponding template group |
+| author | Author |
+| datetime | Current date and time |
+| date | Current date |
+| importList | Import list |
+| tableName | Database table name |
+| tableComment | Database table comment |
+| className | Class name in lowercase |
+| ClassName | Class name |
+| fieldList | Field list |
+| backendPath | Backend path |
+| frontendPath | Frontend path |
+| childFieldList | Child table field list |
+| childTableName | Child table name |
+| mainField | Main table relation field name |
+| childField | Child table relation field name |
+| ChildClassName | Child class name (first letter capitalized) |
+| childClassName | Child class name in lowercase |
+| primaryList | Primary key field list |
+| formList | Form field list |
+| gridList | Grid field list |
+| queryList | Query field list |
+| pk | Primary key field |
+
+### Template Field Properties
+| Variable | Description |
+|----------|-------------|
+| dsName | Data source name |
+| tableName | Table name |
+| fieldName | SQL field name |
+| fieldType | SQL field type |
+| attrName | Java attribute name |
+| attrType | Java attribute type |
+| fieldComment | Field description |
+| sort | Sort |
+| packageName | Attribute package name |
+| autoFill | Auto fill |
+| primaryPk | Whether it's a primary key |
+| baseField | Whether it's a base class field |
+| formItem | Whether it's a form item |
+| formRequired | Form required |
+| formType | Form type |
+| formValidator | Form validator |
+| gridItem | Whether it's a list item |
+| gridSort | List sorting |
+| queryItem | Whether it's a query item |
+| queryType | Query method |
+| queryFormType | Query form type |
+| fieldDict | Field dictionary type |
+
+### Environment Variables
+| Variable | Description |
+|----------|-------------|
+| isSpringBoot3 | Whether it's SpringBoot 3 |
+| isTenant | Whether multi-tenant is supported |

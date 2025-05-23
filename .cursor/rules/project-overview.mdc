@@ -1,0 +1,52 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# CGTM Project Overview
+
+## What is CGTM?
+
+CGTM (Code Generation Template Market - 代码生成模板市场) is an online platform that provides various code generation templates to enhance developer experience. It's designed to work with the PIGX framework for rapid application development.
+
+## Project Purpose
+
+- Provide rich and diverse code generation templates
+- Enable easy template updates through "online update" functionality
+- Support community contributions via GitHub pull requests
+- Accelerate development workflow with pre-built templates
+
+## Core Technologies
+
+- **Template Engine**: Apache Velocity
+- **Backend**: Java with Spring Boot
+- **Frontend**: Vue.js with TypeScript
+- **Database Support**: Multiple database types through dynamic configuration
+- **Architecture**: Microservices with modular design
+
+## Template Categories
+
+1. **Single Table CRUD** (单表增删改查)
+   - Complete CRUD operations for single entities
+   - Includes Controller, Service, Mapper, Entity, and Vue components
+
+2. **Master-Detail CRUD** (主子表增删改查)
+   - Parent-child relationship management
+   - Complex form handling with nested data
+
+3. **VForm Templates**
+   - Visual form designer integration
+   - JSON-based form configuration
+
+## Key Features
+
+- Multi-tenant support (`isTenant` flag)
+- Internationalization (i18n) ready
+- Auto-fill fields support
+- Logical deletion support
+- Dynamic permission and menu generation
+- Modern UI with best UX practices
+
+## License
+
+AGPL 3.0 - Free for PIGX users only

@@ -1,0 +1,100 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Java Backend Template Patterns
+
+## Entity Template Pattern
+
+Entities follow the MyBatis-Plus active record pattern:
+
+```java
+@Data
+@TableName("${tableName}")
+@EqualsAndHashCode(callSuper = true)
+public class ${ClassName}Entity extends Model<${ClassName}Entity> {
+    // Fields with annotations
+}
+```
+
+Key annotations used:
+- `@TableId(type = IdType.ASSIGN_ID)` - For primary keys
+- `@TableField(fill = FieldFill.INSERT)` - Auto-fill on insert
+- `@TableLogic` - Logical deletion flag
+- `@Schema` - OpenAPI documentation
+
+## Controller Template Pattern
+
+Controllers follow RESTful conventions with Spring Boot:
+
+```java
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/${functionName}")
+@Tag(description = "${tableComment}", name = "${tableComment}管理")
+public class ${ClassName}Controller {
+    // CRUD endpoints
+}
+```
+
+Standard endpoints:
+- `GET /{id}` - Get by ID
+- `GET /page` - Paginated list
+- `POST` - Create new
+- `PUT` - Update existing
+- `DELETE` - Delete (logical or physical)
+
+## Service Layer Pattern
+
+Service interface:
+```java
+public interface ${ClassName}Service extends IService<${ClassName}Entity> {
+    // Custom business methods
+}
+```
+
+Implementation extends ServiceImpl:
+```java
+@Service
+@RequiredArgsConstructor
+public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${ClassName}Entity> 
+    implements ${ClassName}Service {
+    // Business logic implementation
+}
+```
+
+## Mapper Pattern
+
+MyBatis mapper interface:
+```java
+@Mapper
+public interface ${ClassName}Mapper extends BaseMapper<${ClassName}Entity> {
+    // Custom SQL methods
+}
+```
+
+## Multi-Tenant Support
+
+When `isTenant` is true:
+- Entity includes `@TenantTable` annotation
+- Automatic tenant filtering in queries
+- Tenant ID auto-fill on insert
+
+## Transaction Handling
+
+Master-detail operations use:
+```java
+@Transactional(rollbackFor = Exception.class)
+public Boolean save${ClassName}(${ClassName}Entity entity) {
+    // Parent save
+    // Children save/update/delete
+}
+```
+
+## Security Annotations
+
+Common security patterns:
+- `@PreAuthorize("@pms.hasPermission('${functionName}_add')")` - Permission check
+- `@SysLog("新增${tableComment}")` - Audit logging
+- `@Inner(false)` - Internal service access control
