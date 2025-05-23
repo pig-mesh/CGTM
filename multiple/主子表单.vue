@@ -216,14 +216,17 @@ const dataRules = ref({
 
 // ========== 6. 方法定义 ==========
 // 获取主子表详情数据
-const get${ClassName}Data = (id: string) => {
-  loading.value = true;
-  getObj({ ${pk.attrName}: id }).then((res: any) => {
-    // 将获取的数据赋值给表单
-    Object.assign(form, res.data[0]);
-  }).finally(() => {
+const get${ClassName}Data = async (id: string) => {
+  try {
+    loading.value = true;
+    const { data } = await getObj({ ${pk.attrName}: id });
+    // 直接将第一条数据赋值给表单
+    Object.assign(form, data[0]);
+  } catch (error) {
+    useMessage().error('获取数据失败');
+  } finally {
     loading.value = false;
-  });
+  }
 };
 
 // 打开抽屉方法
