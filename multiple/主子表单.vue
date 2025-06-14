@@ -10,18 +10,18 @@
         <el-col :span="12" class="mb20">
 #end
 #if($field.formType == 'text')
-          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
-            <el-input v-model="form.${field.attrName}" placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end"/>
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.fieldName}#end" prop="${field.attrName}">
+            <el-input v-model="form.${field.attrName}" placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.fieldName}#end"/>
           </el-form-item>
         </el-col>
 #elseif($field.formType == 'textarea')
-          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
-            <el-input type="textarea" v-model="form.${field.attrName}" placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end"/>
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.fieldName}#end" prop="${field.attrName}">
+            <el-input type="textarea" v-model="form.${field.attrName}" placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.fieldName}#end"/>
           </el-form-item>
         </el-col>
 #elseif($field.formType == 'select')
-          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
-            <el-select v-model="form.${field.attrName}" placeholder="请选择#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end">
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.fieldName}#end" prop="${field.attrName}">
+            <el-select v-model="form.${field.attrName}" placeholder="请选择#if(${field.fieldComment})${field.fieldComment}#else${field.fieldName}#end">
 #if($field.fieldDict)
               <el-option :value="item.value" :label="item.label" v-for="(item, index) in ${field.fieldDict}" :key="index"></el-option>
 #else
@@ -31,7 +31,7 @@
           </el-form-item>
         </el-col>
 #elseif($field.formType == 'radio')
-          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.fieldName}#end" prop="${field.attrName}">
             <el-radio-group v-model="form.${field.attrName}">
 #if($field.fieldDict)
               <el-radio :label="item.value" v-for="(item, index) in ${field.fieldDict}" border :key="index">{{ item.label }}</el-radio>
@@ -42,7 +42,7 @@
           </el-form-item>
         </el-col>
 #elseif($field.formType == 'checkbox')
-          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.fieldName}#end" prop="${field.attrName}">
             <el-checkbox-group v-model="form.${field.attrName}">
 #if($field.fieldDict)
               <el-checkbox :label="item.value" v-for="(item, index) in ${field.fieldDict}" :key="index">{{ item.label }}</el-checkbox>
@@ -54,38 +54,38 @@
           </el-form-item>
         </el-col>
 #elseif($field.formType == 'date')
-          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
-            <el-date-picker type="date" placeholder="请选择#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" v-model="form.${field.attrName}" :value-format="dateStr"></el-date-picker>
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.fieldName}#end" prop="${field.attrName}">
+            <el-date-picker type="date" placeholder="请选择#if(${field.fieldComment})${field.fieldComment}#else${field.fieldName}#end" v-model="form.${field.attrName}" :value-format="dateStr"></el-date-picker>
           </el-form-item>
         </el-col>
 #elseif($field.formType == 'datetime')
-          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
-            <el-date-picker type="datetime" placeholder="请选择#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" v-model="form.${field.attrName}" :value-format="dateTimeStr"></el-date-picker>
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.fieldName}#end" prop="${field.attrName}">
+            <el-date-picker type="datetime" placeholder="请选择#if(${field.fieldComment})${field.fieldComment}#else${field.fieldName}#end" v-model="form.${field.attrName}" :value-format="dateTimeStr"></el-date-picker>
           </el-form-item>
         </el-col>
 #elseif($field.formType == 'number')
-          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
-            <el-input-number :min="1" :max="1000" v-model="form.${field.attrName}" placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end"></el-input-number>
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.fieldName}#end" prop="${field.attrName}">
+            <el-input-number :min="1" :max="1000" v-model="form.${field.attrName}" placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.fieldName}#end"></el-input-number>
           </el-form-item>
         </el-col>
 #elseif($field.formType == 'upload-file')
-          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.fieldName}#end" prop="${field.attrName}">
             <upload-file v-model="form.${field.attrName}"></upload-file>
           </el-form-item>
         </el-col>
 #elseif($field.formType == 'upload-img')
-          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.fieldName}#end" prop="${field.attrName}">
             <upload-img v-model:imageUrl="form.${field.attrName}"></upload-img>
           </el-form-item>
         </el-col>
 #elseif($field.formType == 'editor')
-          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
-            <editor v-model:get-html="form.${field.attrName}" placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end"></editor>
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.fieldName}#end" prop="${field.attrName}">
+            <editor v-model:get-html="form.${field.attrName}" placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.fieldName}#end"></editor>
           </el-form-item>
         </el-col>
 #else
-          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
-            <el-input v-model="form.${field.attrName}" placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end"/>
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.fieldName}#end" prop="${field.attrName}">
+            <el-input v-model="form.${field.attrName}" placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.fieldName}#end"/>
           </el-form-item>
         </el-col>
 #end
@@ -105,7 +105,7 @@
 #elseif($ignoreColumnList.contains(${field.fieldName}))
 #elseif($field.attrName == $childField)
 #else  
-          <el-table-column label="${field.fieldComment}" prop="${field.attrName}">
+          <el-table-column label="#if(${field.fieldComment})${field.fieldComment}#else${field.fieldName}#end" prop="${field.attrName}">
             <template #default="{ row, $index }">
               <el-form-item :prop="`${childClassName}List.${$index}.${field.attrName}`" :rules="[{ required: true, trigger: 'blur' }]">
                 <el-input v-model="row.${field.attrName}" style="width: 100%" />
