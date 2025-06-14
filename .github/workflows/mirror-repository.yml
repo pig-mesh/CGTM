@@ -5,6 +5,7 @@ on:
     branches:
       - master 
       - jdk_17
+      - dev
 
 jobs:
   sync-repo:
