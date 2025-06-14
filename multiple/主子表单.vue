@@ -1,6 +1,6 @@
 <template>
   <el-drawer :title="form.${pk.attrName} ? (detail ? '详情' : '编辑') : '添加'" v-model="visible" size="50%">
-    <el-form ref="dataFormRef" :model="form" :rules="dataRules" label-width="90px" :disabled="detail" v-loading="loading">
+    <el-form ref="dataFormRef" :model="form" :rules="dataRules" :disabled="detail" v-loading="loading">
       <el-row :gutter="24">
 #foreach($field in $formList)
 #if($field.attrName != ${pk.attrName})
