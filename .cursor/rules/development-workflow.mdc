@@ -1,0 +1,111 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Development Workflow
+
+## Using CGTM Templates
+
+### 1. Template Selection
+
+Choose the appropriate template group based on your needs:
+- **单表增删改查** - For simple CRUD operations on a single table
+- **主子表增删改查** - For parent-child relationships (e.g., Order-OrderItems)
+- **vform** - For visual form designer integration
+
+### 2. Configuration Setup
+
+Before generating code, ensure these variables are configured:
+
+**Basic Information:**
+- `author` - Developer name
+- `package` - Base package (e.g., com.pigx.app)
+- `moduleName` - Module identifier (e.g., system, business)
+- `functionName` - Feature name (e.g., user, product)
+
+**Database Configuration:**
+- `tableName` - Database table name
+- `tableComment` - Table description
+- `fieldList` - Field definitions from database
+
+**Path Configuration:**
+- `backendPath` - Backend project root path
+- `frontendPath` - Frontend project root path
+
+### 3. Code Generation Process
+
+1. **Analyze Database Schema**
+   - Primary keys are marked with `primaryPk = '1'`
+   - Auto-fill fields configured (INSERT, UPDATE, INSERT_UPDATE)
+   - Logical deletion field is `del_flag`
+
+2. **Generate Backend Code**
+   - Entity with proper annotations
+   - Mapper interface and XML
+   - Service interface and implementation
+   - Controller with REST endpoints
+
+3. **Generate Frontend Code**
+   - API client in TypeScript
+   - Table component for data display
+   - Form component for data entry
+   - i18n translations if needed
+
+4. **Generate SQL Scripts**
+   - Permission entries
+   - Menu configuration
+
+### 4. Post-Generation Tasks
+
+After code generation:
+
+1. **Review Generated Code**
+   - Check import statements
+   - Verify field mappings
+   - Ensure proper annotations
+
+2. **Customize Business Logic**
+   - Add validation rules
+   - Implement custom queries
+   - Add business-specific methods
+
+3. **Configure Permissions**
+   - Run generated SQL scripts
+   - Assign roles and permissions
+   - Test access control
+
+4. **Frontend Integration**
+   - Add routes
+   - Configure menu items
+   - Test CRUD operations
+
+### 5. Master-Detail Specifics
+
+For parent-child relationships:
+
+1. **Define Relationships**
+   - `mainField` - Parent table foreign key field
+   - `childField` - Child table reference field
+   - Configure cascade operations
+
+2. **Transaction Management**
+   - All operations wrapped in transactions
+   - Proper rollback on errors
+   - Batch operations for children
+
+3. **UI Considerations**
+   - Nested forms for data entry
+   - Inline editing for child records
+   - Proper validation across levels
+
+### 6. Best Practices
+
+- Always use logical deletion (`del_flag`) instead of physical deletion
+- Implement proper validation at both frontend and backend
+- Use dictionaries for standardized dropdowns
+- Follow RESTful conventions for APIs
+- Maintain consistent naming conventions
+- Add comprehensive API documentation with `@Schema` annotations
+- Use permission annotations for security
+- Implement audit logging with `@SysLog`

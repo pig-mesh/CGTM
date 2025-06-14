@@ -1,0 +1,79 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Template Structure Guide
+
+## Directory Organization
+
+```
+CGTM/
+├── single/              # Single table CRUD templates
+├── multiple/            # Master-detail table templates
+├── common/              # Shared templates across modules
+├── vform/               # Visual form designer templates
+└── config.json          # Template configuration mapping
+```
+
+## Template Configuration
+
+The [config.json](mdc:config.json) file defines template groups and their mappings:
+
+```json
+{
+  "单表增删改查": [...],     // Single table templates
+  "主子表增删改查": [...],   // Master-detail templates
+  "vform": [...]           // VForm templates
+}
+```
+
+Each template entry contains:
+- `templateName`: Display name of the template
+- `generatorPath`: Output path with variable substitution
+- `templateFile`: Source template file location
+
+## Single Table Templates
+
+Located in the [single/](mdc:single) directory:
+
+- [Controller.java](mdc:single/Controller.java) - REST API endpoints
+- [Service.java](mdc:single/Service.java) - Business logic interface
+- [ServiceImpl.java](mdc:single/ServiceImpl.java) - Service implementation
+- [实体.java](mdc:single/实体.java) - JPA/MyBatis entity
+- [Mapper.java](mdc:single/Mapper.java) - MyBatis mapper interface
+- [Mapper.xml](mdc:single/Mapper.xml) - SQL mappings
+- [表格.vue](mdc:single/表格.vue) - Data table component
+- [表单.vue](mdc:single/表单.vue) - Form component
+
+## Master-Detail Templates
+
+Located in the [multiple/](mdc:multiple) directory:
+
+- [主子Contoller.java](mdc:multiple/主子Contoller.java) - Parent-child REST APIs
+- [主子Service.java](mdc:multiple/主子Service.java) - Complex business logic
+- [主子ServiceImpl.java](mdc:multiple/主子ServiceImpl.java) - Implementation with transactions
+- [主实体.java](mdc:multiple/主实体.java) - Parent entity
+- [子实体.java](mdc:multiple/子实体.java) - Child entity
+- [子Mapper.java](mdc:multiple/子Mapper.java) - Child table mapper
+- [主子表格.vue](mdc:multiple/主子表格.vue) - Parent-child data display
+- [主子表单.vue](mdc:multiple/主子表单.vue) - Nested form handling
+
+## Common Templates
+
+Located in the [common/](mdc:common) directory:
+
+- [api.ts](mdc:common/api.ts) - TypeScript API client
+- [权限菜单.sql](mdc:common/权限菜单.sql) - Permission and menu SQL
+- [i18n中文模板.ts](mdc:common/i18n中文模板.ts) - Chinese translations
+- [i18n英文模板.ts](mdc:common/i18n英文模板.ts) - English translations
+
+## Path Variables
+
+Template paths support these variables:
+- `${backendPath}` - Backend project root
+- `${frontendPath}` - Frontend project root
+- `${packagePath}` - Java package path (com/example/app)
+- `${moduleName}` - Module name
+- `${ClassName}` - Entity class name
+- `${functionName}` - Function/feature name
