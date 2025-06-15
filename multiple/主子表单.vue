@@ -108,7 +108,7 @@
           <el-table-column label="#if(${field.fieldComment})${field.fieldComment}#else${field.fieldName}#end" prop="${field.attrName}">
             <template #default="{ row, $index }">
               <el-form-item :prop="`${childClassName}List.${$index}.${field.attrName}`" :rules="[{ required: true, trigger: 'blur' }]">
-                <el-input v-model="row.${field.attrName}" style="width: 100%" />
+                <el-input v-model="row.${field.attrName}"/>
               </el-form-item>
             </template>
           </el-table-column>
