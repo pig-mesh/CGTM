@@ -27,6 +27,7 @@
               type="date" 
               placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" 
               v-model="state.queryForm.${field.attrName}"
+              :value-format="dateStr"
             />
           </el-form-item>
 #elseif($field.queryFormType == 'datetime')
@@ -35,6 +36,7 @@
               type="datetime" 
               placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" 
               v-model="state.queryForm.${field.attrName}"
+              :value-format="dateTimeStr"
             />
           </el-form-item>
 #elseif($field.formType == 'radio')

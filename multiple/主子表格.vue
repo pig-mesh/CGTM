@@ -25,6 +25,7 @@
             <el-date-picker 
               type="date" 
               placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" 
+              :value-format="dateStr"
               v-model="state.queryForm.${field.attrName}">
             </el-date-picker>
           </el-form-item>
@@ -33,6 +34,7 @@
             <el-date-picker 
               type="datetime" 
               placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" 
+              :value-format="dateTimeStr"
               v-model="state.queryForm.${field.attrName}">
             </el-date-picker>
           </el-form-item>
