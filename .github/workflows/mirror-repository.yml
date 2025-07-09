@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master 
-      - jdk_17
+      - next
       - dev
 
 jobs:
