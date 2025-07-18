@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.FieldNameConstants;
 
 #if($isTenant)
-import com.pig4cloud.pigx.common.data.tenant.TenantEntity;
+import ${package}.common.core.util.TenantTable;
 #end
 
 #foreach($pkg in $importList)
@@ -24,15 +24,14 @@ import java.time.LocalDateTime;
  * @date ${datetime}
  */
 @Data
+#if($isTenant)
+@TenantTable
+#end
 @TableName("${tableName}")
 @EqualsAndHashCode(callSuper = true)
 @FieldNameConstants
 @Schema(description = "${tableComment}")
-#if($isTenant)
-public class ${ClassName}Entity extends TenantEntity {
-#else
 public class ${ClassName}Entity extends Model<${ClassName}Entity> {
-#end
 
 #foreach ($field in $fieldList)
 #if($field.primaryPk)
