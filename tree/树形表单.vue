@@ -1,0 +1,326 @@
+<template>
+  <el-dialog :title="form.${pk.attrName} ? '编辑' : '新增'" v-model="visible"
+    :close-on-click-modal="false" draggable>
+    <el-form ref="dataFormRef" :model="form" :rules="dataRules" formDialogRef label-width="90px" v-loading="loading">
+      <el-row :gutter="24">
+        <!-- 父级节点选择 -->
+        <el-col :span="24" class="mb20">
+          <el-form-item label="父级节点" prop="parentId">
+            <el-tree-select
+              v-model="form.parentId"
+              :data="parentNodes"
+              :props="treeSelectProps"
+              check-strictly
+              :render-after-expand="false"
+              placeholder="请选择父级节点"
+              style="width: 100%"
+              clearable
+            />
+          </el-form-item>
+        </el-col>
+#foreach($field in $formList)
+#if($field.attrName != ${pk.attrName} && $field.attrName != 'parentId')
+#if($formLayout == 1)
+        <el-col :span="24" class="mb20">
+#elseif($formLayout == 2)
+        <el-col :span="12" class="mb20">
+#end
+#if($field.formType == 'text')
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
+            <el-input v-model="form.${field.attrName}" placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end"/>
+          </el-form-item>
+        </el-col>
+#elseif($field.formType == 'textarea')
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
+            <el-input type="textarea" v-model="form.${field.attrName}" placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end"/>
+          </el-form-item>
+        </el-col>
+#elseif($field.formType == 'select')
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
+            <el-select v-model="form.${field.attrName}" placeholder="请选择#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end">
+#if($field.fieldDict)
+              <el-option :value="item.value" :label="item.label" v-for="(item, index) in ${field.fieldDict}" :key="index"></el-option>
+#else
+              <el-option label="请选择" value="0"></el-option>
+#end
+            </el-select>
+          </el-form-item>
+        </el-col>
+#elseif($field.formType == 'radio')
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
+            <el-radio-group v-model="form.${field.attrName}">
+#if($field.fieldDict)
+              <el-radio :label="item.value" v-for="(item, index) in ${field.fieldDict}" border :key="index">{{ item.label }}</el-radio>
+#else
+              <el-radio label="${field.fieldComment}" border>${field.fieldComment}</el-radio>
+#end
+            </el-radio-group>
+          </el-form-item>
+        </el-col>
+#elseif($field.formType == 'checkbox')
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
+            <el-checkbox-group v-model="form.${field.attrName}">
+#if($field.fieldDict)
+              <el-checkbox :label="item.value" v-for="(item, index) in ${field.fieldDict}" :key="index">{{ item.label }}</el-checkbox>
+#else
+              <el-checkbox label="启用" name="type"></el-checkbox>
+              <el-checkbox label="禁用" name="type"></el-checkbox>
+#end
+            </el-checkbox-group>
+          </el-form-item>
+        </el-col>
+#elseif($field.formType == 'date')
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
+            <el-date-picker type="date" placeholder="请选择#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" v-model="form.${field.attrName}" :value-format="dateStr"></el-date-picker>
+          </el-form-item>
+        </el-col>
+#elseif($field.formType == 'datetime')
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
+            <el-date-picker type="datetime" placeholder="请选择#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" v-model="form.${field.attrName}" :value-format="dateTimeStr"></el-date-picker>
+          </el-form-item>
+        </el-col>
+#elseif($field.formType == 'number')
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
+            <el-input-number :min="1" :max="1000" v-model="form.${field.attrName}" placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end"></el-input-number>
+          </el-form-item>
+        </el-col>
+#elseif($field.formType == 'upload-file')
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
+            <upload-file v-model="form.${field.attrName}"></upload-file>
+          </el-form-item>
+        </el-col>
+#elseif($field.formType == 'upload-img')
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
+            <upload-img v-model:imageUrl="form.${field.attrName}"></upload-img>
+          </el-form-item>
+        </el-col>
+#elseif($field.formType == 'editor')
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
+            <editor v-if="visible" v-model:get-html="form.${field.attrName}" placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end"></editor>
+          </el-form-item>
+        </el-col>
+#else
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
+            <el-input v-model="form.${field.attrName}" placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end"/>
+          </el-form-item>
+        </el-col>
+#end
+#end
+#end
+      </el-row>
+    </el-form>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="visible = false">取 消</el-button>
+        <el-button type="primary" @click="onSubmit" :disabled="loading">确 认</el-button>
+      </span>
+    </template>
+  </el-dialog>
+</template>
+
+<script setup lang="ts" name="${ClassName}TreeDialog">
+// ========== 1. 导入语句 ==========
+import { useDict } from '/@/hooks/dict';
+import { rule } from '/@/utils/validate';
+import { useMessage } from "/@/hooks/message";
+import { getObj, addObj, putObj, validateExist, getParentNodes } from '/@/api/${moduleName}/${functionName}';
+
+// ========== 2. 组件定义 ==========
+// 定义组件事件
+const emit = defineEmits(['refresh']);
+
+// ========== 3. 响应式数据定义 ==========
+// 基础响应式变量
+const dataFormRef = ref(); // 表单引用
+const visible = ref(false); // 弹窗显示状态
+const loading = ref(false); // 加载状态
+const parentNodes = ref([]); // 父级节点数据
+
+// 树形选择器配置
+const treeSelectProps = {
+  children: 'children',
+  label: 'name', // 假设显示字段为name，请根据实际情况调整
+  value: '${pk.attrName}',
+  checkStrictly: true
+};
+
+// 表单数据对象
+const form = reactive({
+#if(!$formList.contains(${pk.attrName}))
+  ${pk.attrName}: '', // 主键
+#end
+  parentId: null, // 父级ID
+#foreach($field in $formList)
+#if($field.attrName != 'parentId')
+#if($field.formType == 'number')
+  ${field.attrName}: 0, // ${field.fieldComment}
+#elseif($field.formType == 'checkbox')
+  ${field.attrName}: [], // ${field.fieldComment}
+#else
+  ${field.attrName}: '', // ${field.fieldComment}
+#end
+#end
+#end
+});
+
+// ========== 4. 字典数据处理 ==========
+#set($fieldDict=[])
+#foreach($field in $gridList)
+#if($field.fieldDict)
+#set($void=$fieldDict.add($field.fieldDict))
+#end
+#end
+#if($fieldDict && $fieldDict.size() > 0)
+// 加载字典数据
+const { $dict.format($fieldDict) } = useDict($dict.quotation($fieldDict));
+#end
+
+// ========== 5. 表单校验规则 ==========
+const dataRules = ref({
+#foreach($field in $formList)
+#if($field.formRequired == '1' && $field.formValidator == 'duplicate')
+  ${field.attrName}: [
+    { required: true, message: '${field.fieldComment}不能为空', trigger: 'blur' },
+    {
+      validator: (rule: any, value: any, callback: any) => {
+        // 重复性校验（编辑时跳过）
+        validateExist(rule, value, callback, form.${pk.attrName} !== '');
+      },
+      trigger: 'blur',
+    }
+  ],
+#elseif($field.formRequired == '1' && $field.formValidator)
+  ${field.attrName}: [
+    { required: true, message: '${field.fieldComment}不能为空', trigger: 'blur' },
+    { validator: rule.${field.formValidator}, trigger: 'blur' }
+  ],
+#elseif($field.formRequired == '1')
+  ${field.attrName}: [
+    { required: true, message: '${field.fieldComment}不能为空', trigger: 'blur' }
+  ],
+#elseif($field.formValidator)
+  ${field.attrName}: [
+    { validator: rule.${field.formValidator}, trigger: 'blur' }
+  ],
+#end
+#end
+});
+
+// ========== 6. 方法定义 ==========
+// 获取详情数据
+const get${ClassName}Data = async (id: string) => {
+  try {
+    loading.value = true;
+    const { data } = await getObj({ ${pk.attrName}: id });
+    // 直接将第一条数据赋值给表单
+    Object.assign(form, data[0]);
+  } catch (error) {
+    useMessage().error('获取数据失败');
+  } finally {
+    loading.value = false;
+  }
+};
+
+// 获取父级节点数据
+const getParentNodesList = async () => {
+  try {
+    const { data } = await getParentNodes();
+    // 添加根节点选项
+    parentNodes.value = [
+      { ${pk.attrName}: null, name: '根节点', children: [] },
+      ...buildParentTree(data)
+    ];
+  } catch (error) {
+    console.error('获取父级节点失败:', error);
+    parentNodes.value = [{ ${pk.attrName}: null, name: '根节点', children: [] }];
+  }
+};
+
+// 构建父级节点树形结构
+const buildParentTree = (data: any[]) => {
+  // 如果后端已经返回树形结构，直接返回
+  if (data && data.length > 0 && data[0].children !== undefined) {
+    return data;
+  }
+  
+  // 如果是平铺数据，需要构建树形结构
+  const map = new Map();
+  const roots: any[] = [];
+  
+  data.forEach(item => {
+    map.set(item.${pk.attrName}, { ...item, children: [] });
+  });
+  
+  data.forEach(item => {
+    const node = map.get(item.${pk.attrName});
+    if (item.parentId) {
+      const parent = map.get(item.parentId);
+      if (parent) {
+        parent.children.push(node);
+      } else {
+        roots.push(node);
+      }
+    } else {
+      roots.push(node);
+    }
+  });
+  
+  return roots;
+};
+
+// 打开弹窗方法
+const openDialog = (id: string, parentId?: string) => {
+  visible.value = true;
+  form.${pk.attrName} = '';
+  form.parentId = parentId || null;
+
+  // 获取父级节点数据
+  getParentNodesList();
+
+  // 重置表单数据
+  nextTick(() => {
+    dataFormRef.value?.resetFields();
+  });
+
+  // 获取${ClassName}信息
+  if (id) {
+    form.${pk.attrName} = id;
+    get${ClassName}Data(id);
+  }
+};
+
+// 提交表单方法
+const onSubmit = async () => {
+  loading.value = true; // 防止重复提交
+  
+  // 表单校验
+  const valid = await dataFormRef.value.validate().catch(() => {});
+  if (!valid) {
+    loading.value = false;
+    return false;
+  }
+
+  try {
+    // 处理父级ID为空的情况
+    if (!form.parentId) {
+      form.parentId = null;
+    }
+    
+    // 根据是否有ID判断是新增还是修改
+    form.${pk.attrName} ? await putObj(form) : await addObj(form);
+    useMessage().success(form.${pk.attrName} ? '修改成功' : '添加成功');
+    visible.value = false;
+    emit('refresh'); // 通知父组件刷新列表
+  } catch (err: any) {
+    useMessage().error(err.msg);
+  } finally {
+    loading.value = false;
+  }
+};
+
+// ========== 7. 对外暴露 ==========
+// 暴露方法给父组件
+defineExpose({
+  openDialog
+});
+</script> 
