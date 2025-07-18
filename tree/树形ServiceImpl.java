@@ -67,7 +67,7 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
             TreeNode<${pk.attrType}> node = new TreeNode<>();
             node.setId(entity.$str.getProperty($pk.attrName)());
             node.setName(entity.$str.getProperty($nameField)());
-            node.$str.setProperty($parentField)(entity.$str.getProperty($parentField)() != null ? entity.$str.getProperty($parentField)() : 0L);
+            node.setParentId($parentField)(entity.$str.getProperty($parentField)() != null ? entity.$str.getProperty($parentField)() : 0L);
 
             // 扩展属性
             Map<String, Object> extra = new HashMap<>();

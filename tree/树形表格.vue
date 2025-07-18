@@ -188,7 +188,7 @@ import { useDict } from '/@/hooks/dict';
 
 // ========== 组件声明 ==========
 // 异步加载表单弹窗组件
-const FormDialog = defineAsyncComponent(() => import('./树形表单.vue'));
+const FormDialog = defineAsyncComponent(() => import('./form.vue'));
 
 // ========== 字典数据 ==========
 #set($fieldDict=[])
