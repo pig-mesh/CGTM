@@ -1,20 +1,25 @@
 package ${package}.${moduleName}.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.lang.tree.Tree;
+import cn.hutool.core.lang.tree.TreeNode;
+import cn.hutool.core.lang.tree.TreeUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import ${package}.${moduleName}.entity.${ClassName}Entity;
 import ${package}.${moduleName}.mapper.${ClassName}Mapper;
 import ${package}.${moduleName}.service.${ClassName}Service;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -33,7 +38,7 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
      * @return 树形结构数据
      */
     @Override
-    public List<${ClassName}Entity> buildTree(LambdaQueryWrapper<${ClassName}Entity> wrapper) {
+    public List<Tree<${pk.attrType}>> buildTree(LambdaQueryWrapper<${ClassName}Entity> wrapper) {
         // 查询所有数据
         List<${ClassName}Entity> allList = list(wrapper);
         
@@ -41,36 +46,48 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
             return new ArrayList<>();
         }
 
-        // 按父ID分组
-        Map<${pk.attrType}, List<${ClassName}Entity>> groupByParent = allList.stream()
-                .collect(Collectors.groupingBy(item -> {
-                    // 假设有parentId字段，如果没有请根据实际情况调整
-                    return item.getParentId() != null ? item.getParentId() : 0L;
-                }));
+        // 转换为TreeNode
+        List<TreeNode<${pk.attrType}>> collect = allList.stream().map(getNodeFunction()).toList();
 
-        // 构建树形结构
-        return buildTreeRecursive(groupByParent, 0L);
+        // 使用TreeUtil构建树形结构，根节点ID为0
+#if($pk.attrType == 'Long')
+        return TreeUtil.build(collect, 0L);
+#else
+        return TreeUtil.build(collect, 0);
+#end
     }
 
     /**
-     * 递归构建树形结构
-     * @param groupByParent 按父ID分组的数据
-     * @param parentId 父ID
-     * @return 树形结构数据
+     * 获取TreeNode转换函数
+     * @return TreeNode转换函数
      */
-    private List<${ClassName}Entity> buildTreeRecursive(Map<${pk.attrType}, List<${ClassName}Entity>> groupByParent, ${pk.attrType} parentId) {
-        List<${ClassName}Entity> children = groupByParent.get(parentId);
-        if (CollUtil.isEmpty(children)) {
-            return new ArrayList<>();
-        }
+    @NotNull
+    private Function<${ClassName}Entity, TreeNode<${pk.attrType}>> getNodeFunction() {
+        return entity -> {
+            TreeNode<${pk.attrType}> node = new TreeNode<>();
+            node.setId(entity.get${str.capitalizeFirst($pk.attrName)}());
+#foreach($field in $fieldList)
+#if($field.attrName == 'name' || $field.fieldComment.contains('名称'))
+            node.setName(entity.get${str.capitalizeFirst($field.attrName)}());
+#end
+#end
+#if($pk.attrType == 'Long')
+            node.setParentId(entity.getParentId() != null ? entity.getParentId() : 0L);
+#else
+            node.setParentId(entity.getParentId() != null ? entity.getParentId() : 0);
+#end
 
-        children.forEach(child -> {
-            List<${ClassName}Entity> subChildren = buildTreeRecursive(groupByParent, child.get${str.capitalizeFirst($pk.attrName)}());
-            child.setChildren(subChildren);
-            child.setHasChildren(!CollUtil.isEmpty(subChildren));
-        });
-
-        return children;
+            // 扩展属性
+            Map<String, Object> extra = new HashMap<>();
+#foreach($field in $fieldList)
+#if(!$field.primaryPk && $field.attrName != 'parentId')
+            extra.put(${ClassName}Entity.Fields.${field.attrName}, entity.get${str.capitalizeFirst($field.attrName)}());
+#end
+#end
+            
+            node.setExtra(extra);
+            return node;
+        };
     }
 
     /**
@@ -82,7 +99,7 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
         LambdaQueryWrapper<${ClassName}Entity> wrapper = Wrappers.lambdaQuery();
         // 查询所有父级节点（parentId为null或0的节点）
         wrapper.and(w -> w.isNull(${ClassName}Entity::getParentId).or().eq(${ClassName}Entity::getParentId, 0));
-        wrapper.orderByAsc(${ClassName}Entity::getSort); // 假设有sort字段用于排序
+        wrapper.orderByAsc(${ClassName}Entity::$str.getProperty($pk.attrName)); // 按主键排序
         return list(wrapper);
     }
 
@@ -95,7 +112,7 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
     public List<${ClassName}Entity> getChildrenByParentId(${pk.attrType} parentId) {
         LambdaQueryWrapper<${ClassName}Entity> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(${ClassName}Entity::getParentId, parentId);
-        wrapper.orderByAsc(${ClassName}Entity::getSort); // 假设有sort字段用于排序
+        wrapper.orderByAsc(${ClassName}Entity::$str.getProperty($pk.attrName)); // 按主键排序
         return list(wrapper);
     }
 
@@ -136,7 +153,7 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
         
         LambdaQueryWrapper<${ClassName}Entity> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(${ClassName}Entity::getParentId, parentId);
-        wrapper.select(${ClassName}Entity::get${str.capitalizeFirst($pk.attrName)});
+        wrapper.select(${ClassName}Entity::$str.getProperty($pk.attrName));
         
         List<${ClassName}Entity> children = list(wrapper);
         

@@ -97,16 +97,7 @@
           >
             展开/折叠
           </el-button>
-          <el-button 
-            plain 
-            icon="upload-filled" 
-            type="primary" 
-            class="ml10" 
-            @click="excelUploadRef.show()" 
-            v-auth="'${moduleName}_${functionName}_add'"
-          >
-            导入
-          </el-button>
+
           <el-button 
             plain 
             :disabled="multiple" 
@@ -119,8 +110,6 @@
           </el-button>
           <right-toolbar 
             v-model:showSearch="showSearch" 
-            :export="'${moduleName}_${functionName}_export'"
-            @exportExcel="exportExcel" 
             class="ml10 mr20" 
             style="float: right;"
             @queryTable="getDataList"
@@ -197,14 +186,7 @@
     <!-- 编辑、新增弹窗 -->
     <form-dialog ref="formDialogRef" @refresh="getDataList(false)" />
 
-    <!-- 导入excel弹窗 (需要在 upms-biz/resources/file 下维护模板) -->
-    <upload-excel
-      ref="excelUploadRef"
-      title="导入"
-      url="/${moduleName}/${functionName}/import"
-      temp-url="/admin/sys-file/local/file/${functionName}.xlsx"
-      @refreshDataList="getDataList"
-    />
+
   </div>
 </template>
 
@@ -238,7 +220,6 @@ const { $dict.format($fieldDict) } = useDict($dict.quotation($fieldDict));
 
 // ========== 组件引用 ==========
 const formDialogRef = ref();          // 表单弹窗引用
-const excelUploadRef = ref();         // Excel上传弹窗引用
 const queryRef = ref();               // 查询表单引用
 
 // ========== 响应式数据 ==========
@@ -249,17 +230,18 @@ const isExpandAll = ref(false);       // 是否展开所有节点
 
 // ========== 表格状态 ==========
 const state: BasicTableProps = reactive<BasicTableProps>({
+  isPage: false,  // 是否分页
   queryForm: {},      // 查询参数
   pageList: fetchTreeList, // 树形数据查询方法（不分页）
   loading: false,     // 加载状态
   dataList: []        // 数据列表
 });
 
+
 // ========== Hook引用 ==========
 // 表格相关Hook (树形表格不使用分页)
 const {
   getDataList,
-  downBlobFile,
   tableStyle
 } = useTable(state);
 
@@ -283,16 +265,7 @@ const expandAll = () => {
   isExpandAll.value = !isExpandAll.value;
 };
 
-/**
- * 导出Excel文件
- */
-const exportExcel = () => {
-  downBlobFile(
-    '/${moduleName}/${functionName}/export',
-    Object.assign(state.queryForm, { ids: selectObjs }),
-    '${functionName}.xlsx'
-  );
-};
+
 
 /**
  * 表格多选事件处理
@@ -329,29 +302,3 @@ onMounted(() => {
   getDataList();
 });
 </script>
-
-<style scoped>
-.layout-padding {
-  padding: 15px;
-}
-
-.layout-padding-auto {
-  margin: 0 auto;
-}
-
-.layout-padding-view {
-  min-height: calc(100vh - 50px);
-}
-
-.mb8 {
-  margin-bottom: 8px;
-}
-
-.ml10 {
-  margin-left: 10px;
-}
-
-.mr20 {
-  margin-right: 20px;
-}
-</style> 

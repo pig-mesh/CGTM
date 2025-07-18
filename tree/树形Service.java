@@ -1,5 +1,6 @@
 package ${package}.${moduleName}.service;
 
+import cn.hutool.core.lang.tree.Tree;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import ${package}.${moduleName}.entity.${ClassName}Entity;
@@ -19,7 +20,7 @@ public interface ${ClassName}Service extends IService<${ClassName}Entity> {
      * @param wrapper 查询条件
      * @return 树形结构数据
      */
-    List<${ClassName}Entity> buildTree(LambdaQueryWrapper<${ClassName}Entity> wrapper);
+    List<Tree<${pk.attrType}>> buildTree(LambdaQueryWrapper<${ClassName}Entity> wrapper);
 
     /**
      * 获取所有父级节点

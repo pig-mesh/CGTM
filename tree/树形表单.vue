@@ -4,7 +4,11 @@
     <el-form ref="dataFormRef" :model="form" :rules="dataRules" formDialogRef label-width="90px" v-loading="loading">
       <el-row :gutter="24">
         <!-- 父级节点选择 -->
+#if($formLayout == 1)
         <el-col :span="24" class="mb20">
+#elseif($formLayout == 2)
+        <el-col :span="12" class="mb20">
+#end
           <el-form-item label="父级节点" prop="parentId">
             <el-tree-select
               v-model="form.parentId"

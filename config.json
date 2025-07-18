@@ -132,7 +132,7 @@
     {
       "templateName": "实体",
       "generatorPath": "${backendPath}/src/main/java/${packagePath}/${moduleName}/entity/${ClassName}Entity.java",
-      "templateFile": "single/实体.java"
+      "templateFile": "tree/树形实体.java"
     },
     {
       "templateName": "Mapper",
