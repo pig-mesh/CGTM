@@ -68,7 +68,7 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
             node.setId(entity.$str.getProperty($pk.attrName)());
 #foreach($field in $fieldList)
 #if($field.attrName == 'name' || $field.fieldComment.contains('名称'))
-            node.setName(entity.get${str.capitalizeFirst($field.attrName)}());
+            node.setName(entity.$str.getProperty($field.attrName)());
 #end
 #end
             node.setParentId(entity.getParentId() != null ? entity.getParentId() : 0L);
