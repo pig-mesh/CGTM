@@ -84,7 +84,7 @@
             icon="folder-add" 
             type="primary" 
             class="ml10" 
-            @click="formDialogRef.openDialog(undefined, null)"
+            @click="formDialogRef.openDialog()"
             v-auth="'${moduleName}_${functionName}_add'"
           >
             新增
@@ -188,7 +188,7 @@ import { useDict } from '/@/hooks/dict';
 
 // ========== 组件声明 ==========
 // 异步加载表单弹窗组件
-const FormDialog = defineAsyncComponent(() => import('./form.vue'));
+const FormDialog = defineAsyncComponent(() => import('./树形表单.vue'));
 
 // ========== 字典数据 ==========
 #set($fieldDict=[])

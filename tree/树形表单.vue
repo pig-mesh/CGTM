@@ -1,6 +1,6 @@
 <template>
   <el-dialog :title="form.${pk.attrName} ? '编辑' : '新增'" v-model="visible"
-    :close-on-click-modal="false" draggable>
+    :close-on-click-modal="false" draggable destroy-on-close>
     <el-form ref="dataFormRef" :model="form" :rules="dataRules" formDialogRef label-width="90px" v-loading="loading">
       <el-row :gutter="24">
         <!-- 父级节点选择 -->
@@ -9,9 +9,9 @@
 #elseif($formLayout == 2)
         <el-col :span="12" class="mb20">
 #end
-          <el-form-item label="父级节点" prop="parentId">
+          <el-form-item label="父级节点" prop="${parentField}">
             <el-tree-select
-              v-model="form.parentId"
+              v-model="form.${parentField}"
               :data="parentNodes"
               :props="treeSelectProps"
               check-strictly
@@ -23,7 +23,7 @@
           </el-form-item>
         </el-col>
 #foreach($field in $formList)
-#if($field.attrName != ${pk.attrName} && $field.attrName != 'parentId')
+#if($field.attrName != ${pk.attrName} && $field.attrName != ${parentField})
 #if($formLayout == 1)
         <el-col :span="24" class="mb20">
 #elseif($formLayout == 2)
@@ -140,10 +140,13 @@ import { rule } from '/@/utils/validate';
 interface TreeNode {
   ${pk.attrName}: string | number | null;
 #foreach($field in $formList)
-#if($field.attrName == 'name')
-  name: string;
+#if($field.attrName != ${pk.attrName} && $field.attrName != ${parentField})
+#set($nameField = $field)
 #break
 #end
+#end
+#if($nameField)
+  ${nameField.attrName}: string;
 #end
   children?: TreeNode[];
 }
@@ -152,9 +155,9 @@ interface FormData {
 #if(!$formList.contains(${pk.attrName}))
   ${pk.attrName}?: string;
 #end
-  parentId?: string | number | null;
+  ${parentField}?: string | number | null;
 #foreach($field in $formList)
-#if($field.attrName != 'parentId')
+#if($field.attrName != ${parentField})
 #if($field.formType == 'number')
   ${field.attrName}: number;
 #elseif($field.formType == 'checkbox')
@@ -179,11 +182,9 @@ const parentNodes = ref<TreeNode[]>([]); // 父级节点数据
 const treeSelectProps = {
   children: 'children',
 #foreach($field in $formList)
-#if($field.attrName == 'name')
-  label: 'name',
+#if($field.attrName != ${pk.attrName} && $field.attrName != ${parentField})
+  label: '${field.attrName}',
 #break
-#else
-  label: '${field.attrName}', // 请根据实际显示字段调整
 #end
 #end
   value: '${pk.attrName}',
@@ -195,9 +196,9 @@ const form = reactive<FormData>({
 #if(!$formList.contains(${pk.attrName}))
   ${pk.attrName}: '', // 主键
 #end
-  parentId: null, // 父级ID
+  ${parentField}: null, // 父级ID
 #foreach($field in $formList)
-#if($field.attrName != 'parentId')
+#if($field.attrName != ${parentField})
 #if($field.formType == 'number')
   ${field.attrName}: 0, // ${field.fieldComment}
 #elseif($field.formType == 'checkbox')
@@ -223,7 +224,7 @@ const { $dict.format($fieldDict) } = useDict($dict.quotation($fieldDict));
 
 // ========== 表单校验规则 ==========
 const dataRules = ref({
-  parentId: [
+  ${parentField}: [
     { 
       required: true, 
       validator: (rule: any, value: any, callback: any) => {
@@ -291,12 +292,12 @@ const getParentNodesList = async () => {
     const { data } = await getParentNodes();
     // 添加根节点选项
     parentNodes.value = [
-      { ${pk.attrName}: null, name: '根节点', children: [] },
+      { ${pk.attrName}: 0, ${nameField.attrName}: '根节点', children: [] },
       ...(data || [])
     ];
   } catch (error) {
     console.error('获取父级节点失败:', error);
-    parentNodes.value = [{ ${pk.attrName}: null, name: '根节点', children: [] }];
+    parentNodes.value = [{ ${pk.attrName}: 0, ${nameField.attrName}: '根节点', children: [] }];
   }
 };
 
@@ -305,40 +306,23 @@ const getParentNodesList = async () => {
  * @param id 编辑时的数据ID
  * @param parentId 新增时的父级ID
  */
-const openDialog = (id?: string, parentId?: string | number) => {
+const openDialog = async (id?: string, parentId?: string | number) => {
+  form.${pk.attrName} = '';
   visible.value = true;
-  
-  // 重置表单数据
-  Object.assign(form, {
-#if(!$formList.contains(${pk.attrName}))
-    ${pk.attrName}: '',
-#end
-    parentId: parentId || null, // 新增时设置父级ID
-#foreach($field in $formList)
-#if($field.attrName != 'parentId')
-#if($field.formType == 'number')
-    ${field.attrName}: 0,
-#elseif($field.formType == 'checkbox')
-    ${field.attrName}: [],
-#else
-    ${field.attrName}: '',
-#end
-#end
-#end
-  });
+  form.${parentField} = parentId || '0';
 
-  // 获取父级节点数据
-  getParentNodesList();
+  // 初始化父级节点数据
+  const { data } = await getParentNodes();
+  parentNodes.value = [{ ${pk.attrName}: '0', ${nameField.attrName}: '根节点', children: data }];
 
   // 重置表单验证
   nextTick(() => {
     dataFormRef.value?.resetFields();
   });
 
-  // 如果是编辑模式，获取数据详情
   if (id) {
     form.${pk.attrName} = id;
-    get${ClassName}Data(id);
+    await get${ClassName}Data(id);
   }
 };
 
@@ -348,29 +332,21 @@ const openDialog = (id?: string, parentId?: string | number) => {
 const onSubmit = async () => {
   // 防止重复提交
   if (loading.value) return;
-  
-  // 表单校验
-  try {
-    await dataFormRef.value.validate();
-  } catch {
-    return;
-  }
-
   loading.value = true;
   
   try {
+    const valid = await dataFormRef.value.validate().catch(() => {});
+		if (!valid) {
+			loading.value = false;
+			return false;
+    }
+
     // 处理父级ID，如果选择根节点(null)则设为null，其他情况保持原值
-    const submitData = {
-      ...form,
-      parentId: form.parentId === null ? null : form.parentId
-    };
-    
-    // 根据是否有ID判断是新增还是修改
     if (form.${pk.attrName}) {
-      await putObj(submitData);
+      await putObj(form);
       useMessage().success('修改成功');
     } else {
-      await addObj(submitData);
+      await addObj(form);
       useMessage().success('添加成功');
     }
     
