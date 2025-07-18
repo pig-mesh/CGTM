@@ -100,6 +100,16 @@
           >
             删除
           </el-button>
+
+          <el-button 
+            plain 
+            :icon="isExpand ? 'FolderOpened' : 'Folder'" 
+            type="primary"
+            @click="handleExpand"
+          >
+            {{ isExpand ? '全部折叠' : '全部展开' }}
+          </el-button>
+
           <right-toolbar 
             v-model:showSearch="showSearch" 
             class="ml10 mr20" 
@@ -111,14 +121,17 @@
 
       <!-- 树形数据表格区域 -->
       <el-table 
+        ref="tableRef"
         :data="state.dataList" 
         v-loading="state.loading" 
         border 
         row-key="${pk.attrName}"
+        default-expand-all
         :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
         :cell-style="tableStyle.cellStyle" 
         :header-cell-style="tableStyle.headerCellStyle"
         @selection-change="selectionChangHandle"
+        @expand-change="onExpandChange"
       >
         <el-table-column type="selection" width="40" align="center" />
         <el-table-column type="index" label="#" width="40" />
@@ -210,11 +223,13 @@ const { $dict.format($fieldDict) } = useDict($dict.quotation($fieldDict));
 // ========== 组件引用 ==========
 const formDialogRef = ref();          // 表单弹窗引用
 const queryRef = ref();               // 查询表单引用
+const tableRef = ref();               // 表格引用
 
 // ========== 响应式数据 ==========
 const showSearch = ref(true);         // 是否显示搜索区域
 const selectObjs = ref([]) as any;    // 表格多选数据
 const multiple = ref(true);           // 是否多选
+const isExpand = ref(true);           // 是否展开状态，默认展开
 
 // ========== 表格状态 ==========
 const state: BasicTableProps = reactive<BasicTableProps>({
@@ -255,6 +270,17 @@ const selectionChangHandle = (objs: { ${pk.attrName}: string }[]) => {
 };
 
 /**
+ * 树形表格展开状态变化事件
+ * 当用户手动点击展开/折叠按钮时触发
+ * @param row 当前行数据
+ * @param expanded 是否展开
+ */
+const onExpandChange = (row: any, expanded: boolean) => {
+  // 可以在这里添加额外的逻辑，比如记录展开状态等
+  // console.log('Row expand changed:', row, expanded);
+};
+
+/**
  * 删除数据处理
  * @param ids 要删除的数据ID数组
  */
@@ -271,6 +297,40 @@ const handleDelete = async (ids: string[]) => {
     useMessage().success('删除成功');
   } catch (err: any) {
     useMessage().error(err.msg);
+  }
+};
+
+/**
+ * 展开/折叠树形表格
+ * 基于Element Plus官方文档的toggleRowExpansion方法实现
+ */
+const handleExpand = () => {
+  isExpand.value = !isExpand.value;
+  
+  // 等待DOM更新后再进行展开/折叠操作
+  nextTick(() => {
+    if (state.dataList && state.dataList.length > 0 && tableRef.value) {
+      toggleExpand(state.dataList, isExpand.value);
+    }
+  });
+};
+
+/**
+ * 递归展开/折叠所有节点
+ * 使用Element Plus Table组件的toggleRowExpansion方法
+ * @param children 子节点数组
+ * @param unfold 是否展开
+ */
+const toggleExpand = (children: any[], unfold = true) => {
+  for (const item of children) {
+    // 使用Element Plus官方的toggleRowExpansion方法
+    // 第二个参数为可选的布尔值，直接设置展开状态
+    tableRef.value?.toggleRowExpansion(item, unfold);
+    
+    // 递归处理子节点
+    if (item.children && item.children.length > 0) {
+      toggleExpand(item.children, unfold);
+    }
   }
 };
 
