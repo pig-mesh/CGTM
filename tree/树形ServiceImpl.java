@@ -66,19 +66,14 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
         return entity -> {
             TreeNode<${pk.attrType}> node = new TreeNode<>();
             node.setId(entity.$str.getProperty($pk.attrName)());
-#foreach($field in $fieldList)
-#if($field.attrName == 'name' || $field.fieldComment.contains('名称'))
-            node.setName(entity.$str.getProperty($field.attrName)());
-#end
-#end
-            node.setParentId(entity.getParentId() != null ? entity.getParentId() : 0L);
+            node.setName(entity.$str.getProperty($nameField)());
+            node.$str.setProperty($parentIdField)(entity.$str.getProperty($parentIdField)() != null ? entity.$str.getProperty($parentIdField)() : 0L);
 
             // 扩展属性
             Map<String, Object> extra = new HashMap<>();
 #foreach($field in $fieldList)
             extra.put(${ClassName}Entity.Fields.${field.attrName}, entity.$str.getProperty($field.attrName)());
 #end
-            
             node.setExtra(extra);
             return node;
         };
@@ -92,7 +87,7 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
     public List<${ClassName}Entity> getParentNodes() {
         LambdaQueryWrapper<${ClassName}Entity> wrapper = Wrappers.lambdaQuery();
         // 查询所有父级节点（parentId为null或0的节点）
-        wrapper.and(w -> w.isNull(${ClassName}Entity::getParentId).or().eq(${ClassName}Entity::getParentId, 0));
+        wrapper.and(w -> w.isNull(${ClassName}Entity::$str.getProperty($parentIdField)).or().eq(${ClassName}Entity::$str.getProperty($parentIdField), 0));
         wrapper.orderByAsc(${ClassName}Entity::$str.getProperty($pk.attrName)); // 按主键排序
         return list(wrapper);
     }
@@ -105,7 +100,7 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
     @Override
     public List<${ClassName}Entity> getChildrenByParentId(${pk.attrType} parentId) {
         LambdaQueryWrapper<${ClassName}Entity> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(${ClassName}Entity::getParentId, parentId);
+        wrapper.eq(${ClassName}Entity::$str.getProperty($parentIdField), parentId);
         wrapper.orderByAsc(${ClassName}Entity::$str.getProperty($pk.attrName)); // 按主键排序
         return list(wrapper);
     }
@@ -146,7 +141,7 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
         List<${pk.attrType}> childIds = new ArrayList<>();
         
         LambdaQueryWrapper<${ClassName}Entity> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(${ClassName}Entity::getParentId, parentId);
+        wrapper.eq(${ClassName}Entity::$str.getProperty($parentIdField), parentId);
         wrapper.select(${ClassName}Entity::$str.getProperty($pk.attrName));
         
         List<${ClassName}Entity> children = list(wrapper);
