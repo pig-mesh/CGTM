@@ -152,7 +152,7 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
         List<${ClassName}Entity> children = list(wrapper);
         
         for (${ClassName}Entity child : children) {
-            ${pk.attrType} childId = child.get${str.capitalizeFirst($pk.attrName)}();
+            ${pk.attrType} childId = child.$str.getProperty($pk.attrName)();
             childIds.add(childId);
             // 递归获取子节点的子节点
             childIds.addAll(getChildIdsRecursive(childId));
