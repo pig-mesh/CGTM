@@ -123,33 +123,75 @@
 </template>
 
 <script setup lang="ts" name="${ClassName}TreeDialog">
-// ========== 1. 导入语句 ==========
-import { useDict } from '/@/hooks/dict';
-import { rule } from '/@/utils/validate';
+// ========== 导入语句 ==========
 import { useMessage } from "/@/hooks/message";
-import { getObj, addObj, putObj, validateExist, getParentNodes } from '/@/api/${moduleName}/${functionName}';
+import { getObj, addObj, putObj, getParentNodes } from '/@/api/${moduleName}/${functionName}';
+#if($fieldDict && $fieldDict.size() > 0)
+import { useDict } from '/@/hooks/dict';
+#end
+#foreach($field in $formList)
+#if($field.formValidator && $field.formValidator != 'duplicate')
+import { rule } from '/@/utils/validate';
+#break
+#end
+#end
 
-// ========== 2. 组件定义 ==========
-// 定义组件事件
+// ========== 类型定义 ==========
+interface TreeNode {
+  ${pk.attrName}: string | number | null;
+#foreach($field in $formList)
+#if($field.attrName == 'name')
+  name: string;
+#break
+#end
+#end
+  children?: TreeNode[];
+}
+
+interface FormData {
+#if(!$formList.contains(${pk.attrName}))
+  ${pk.attrName}?: string;
+#end
+  parentId?: string | number | null;
+#foreach($field in $formList)
+#if($field.attrName != 'parentId')
+#if($field.formType == 'number')
+  ${field.attrName}: number;
+#elseif($field.formType == 'checkbox')
+  ${field.attrName}: any[];
+#else
+  ${field.attrName}: string;
+#end
+#end
+#end
+}
+
+// ========== 组件定义 ==========
 const emit = defineEmits(['refresh']);
 
-// ========== 3. 响应式数据定义 ==========
-// 基础响应式变量
+// ========== 响应式数据定义 ==========
 const dataFormRef = ref(); // 表单引用
 const visible = ref(false); // 弹窗显示状态
 const loading = ref(false); // 加载状态
-const parentNodes = ref([]); // 父级节点数据
+const parentNodes = ref<TreeNode[]>([]); // 父级节点数据
 
 // 树形选择器配置
 const treeSelectProps = {
   children: 'children',
-  label: 'name', // 假设显示字段为name，请根据实际情况调整
+#foreach($field in $formList)
+#if($field.attrName == 'name')
+  label: 'name',
+#break
+#else
+  label: '${field.attrName}', // 请根据实际显示字段调整
+#end
+#end
   value: '${pk.attrName}',
   checkStrictly: true
 };
 
 // 表单数据对象
-const form = reactive({
+const form = reactive<FormData>({
 #if(!$formList.contains(${pk.attrName}))
   ${pk.attrName}: '', // 主键
 #end
@@ -167,9 +209,9 @@ const form = reactive({
 #end
 });
 
-// ========== 4. 字典数据处理 ==========
+// ========== 字典数据处理 ==========
 #set($fieldDict=[])
-#foreach($field in $gridList)
+#foreach($field in $formList)
 #if($field.fieldDict)
 #set($void=$fieldDict.add($field.fieldDict))
 #end
@@ -179,8 +221,21 @@ const form = reactive({
 const { $dict.format($fieldDict) } = useDict($dict.quotation($fieldDict));
 #end
 
-// ========== 5. 表单校验规则 ==========
+// ========== 表单校验规则 ==========
 const dataRules = ref({
+  parentId: [
+    { 
+      required: true, 
+      validator: (rule: any, value: any, callback: any) => {
+        if (value === null || value === undefined || value === '') {
+          callback(new Error('请选择父级节点'));
+        } else {
+          callback();
+        }
+      },
+      trigger: 'change' 
+    }
+  ],
 #foreach($field in $formList)
 #if($field.formRequired == '1' && $field.formValidator == 'duplicate')
   ${field.attrName}: [
@@ -210,14 +265,17 @@ const dataRules = ref({
 #end
 });
 
-// ========== 6. 方法定义 ==========
-// 获取详情数据
+// ========== 方法定义 ==========
+/**
+ * 获取详情数据
+ */
 const get${ClassName}Data = async (id: string) => {
   try {
     loading.value = true;
     const { data } = await getObj({ ${pk.attrName}: id });
-    // 直接将第一条数据赋值给表单
-    Object.assign(form, data[0]);
+    if (data && data.length > 0) {
+      Object.assign(form, data[0]);
+    }
   } catch (error) {
     useMessage().error('获取数据失败');
   } finally {
@@ -225,14 +283,16 @@ const get${ClassName}Data = async (id: string) => {
   }
 };
 
-// 获取父级节点数据
+/**
+ * 获取父级节点数据
+ */
 const getParentNodesList = async () => {
   try {
     const { data } = await getParentNodes();
     // 添加根节点选项
     parentNodes.value = [
       { ${pk.attrName}: null, name: '根节点', children: [] },
-      ...buildParentTree(data)
+      ...(data || [])
     ];
   } catch (error) {
     console.error('获取父级节点失败:', error);
@@ -240,90 +300,90 @@ const getParentNodesList = async () => {
   }
 };
 
-// 构建父级节点树形结构
-const buildParentTree = (data: any[]) => {
-  // 如果后端已经返回树形结构，直接返回
-  if (data && data.length > 0 && data[0].children !== undefined) {
-    return data;
-  }
-  
-  // 如果是平铺数据，需要构建树形结构
-  const map = new Map();
-  const roots: any[] = [];
-  
-  data.forEach(item => {
-    map.set(item.${pk.attrName}, { ...item, children: [] });
-  });
-  
-  data.forEach(item => {
-    const node = map.get(item.${pk.attrName});
-    if (item.parentId) {
-      const parent = map.get(item.parentId);
-      if (parent) {
-        parent.children.push(node);
-      } else {
-        roots.push(node);
-      }
-    } else {
-      roots.push(node);
-    }
-  });
-  
-  return roots;
-};
-
-// 打开弹窗方法
-const openDialog = (id: string, parentId?: string) => {
+/**
+ * 打开弹窗方法
+ * @param id 编辑时的数据ID
+ * @param parentId 新增时的父级ID
+ */
+const openDialog = (id?: string, parentId?: string | number) => {
   visible.value = true;
-  form.${pk.attrName} = '';
-  form.parentId = parentId || null;
+  
+  // 重置表单数据
+  Object.assign(form, {
+#if(!$formList.contains(${pk.attrName}))
+    ${pk.attrName}: '',
+#end
+    parentId: parentId || null, // 新增时设置父级ID
+#foreach($field in $formList)
+#if($field.attrName != 'parentId')
+#if($field.formType == 'number')
+    ${field.attrName}: 0,
+#elseif($field.formType == 'checkbox')
+    ${field.attrName}: [],
+#else
+    ${field.attrName}: '',
+#end
+#end
+#end
+  });
 
   // 获取父级节点数据
   getParentNodesList();
 
-  // 重置表单数据
+  // 重置表单验证
   nextTick(() => {
     dataFormRef.value?.resetFields();
   });
 
-  // 获取${ClassName}信息
+  // 如果是编辑模式，获取数据详情
   if (id) {
     form.${pk.attrName} = id;
     get${ClassName}Data(id);
   }
 };
 
-// 提交表单方法
+/**
+ * 提交表单方法
+ */
 const onSubmit = async () => {
-  loading.value = true; // 防止重复提交
+  // 防止重复提交
+  if (loading.value) return;
   
   // 表单校验
-  const valid = await dataFormRef.value.validate().catch(() => {});
-  if (!valid) {
-    loading.value = false;
-    return false;
+  try {
+    await dataFormRef.value.validate();
+  } catch {
+    return;
   }
 
+  loading.value = true;
+  
   try {
-    // 处理父级ID为空的情况
-    if (!form.parentId) {
-      form.parentId = null;
-    }
+    // 处理父级ID，如果选择根节点(null)则设为null，其他情况保持原值
+    const submitData = {
+      ...form,
+      parentId: form.parentId === null ? null : form.parentId
+    };
     
     // 根据是否有ID判断是新增还是修改
-    form.${pk.attrName} ? await putObj(form) : await addObj(form);
-    useMessage().success(form.${pk.attrName} ? '修改成功' : '添加成功');
+    if (form.${pk.attrName}) {
+      await putObj(submitData);
+      useMessage().success('修改成功');
+    } else {
+      await addObj(submitData);
+      useMessage().success('添加成功');
+    }
+    
     visible.value = false;
     emit('refresh'); // 通知父组件刷新列表
   } catch (err: any) {
-    useMessage().error(err.msg);
+    useMessage().error(err.msg || '操作失败');
   } finally {
     loading.value = false;
   }
 };
 
-// ========== 7. 对外暴露 ==========
-// 暴露方法给父组件
+// ========== 对外暴露 ==========
 defineExpose({
   openDialog
 });

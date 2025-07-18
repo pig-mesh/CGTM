@@ -84,18 +84,10 @@
             icon="folder-add" 
             type="primary" 
             class="ml10" 
-            @click="formDialogRef.openDialog()"
+            @click="formDialogRef.openDialog(undefined, null)"
             v-auth="'${moduleName}_${functionName}_add'"
           >
             新增
-          </el-button>
-          <el-button 
-            icon="sort" 
-            type="primary" 
-            class="ml10" 
-            @click="expandAll"
-          >
-            展开/折叠
           </el-button>
 
           <el-button 
@@ -127,7 +119,6 @@
         :cell-style="tableStyle.cellStyle" 
         :header-cell-style="tableStyle.headerCellStyle"
         @selection-change="selectionChangHandle"
-        :default-expand-all="isExpandAll"
       >
         <el-table-column type="selection" width="40" align="center" />
         <el-table-column type="index" label="#" width="40" />
@@ -135,7 +126,7 @@
 #if($field.fieldDict)
         <el-table-column prop="${field.attrName}" label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" show-overflow-tooltip>
           <template #default="scope">
-            <dict-tag :options="$field.fieldDict" :value="scope.row.${field.attrName}" />
+            <dict-tag :options="${field.fieldDict}" :value="scope.row.${field.attrName}" />
           </template>
         </el-table-column>
 #else
@@ -156,7 +147,7 @@
               text 
               type="primary" 
               v-auth="'${moduleName}_${functionName}_add'"
-              @click="formDialogRef.openDialog('', scope.row.${pk.attrName})"
+              @click="formDialogRef.openDialog(undefined, scope.row.${pk.attrName})"
             >
               新增
             </el-button>
@@ -185,8 +176,6 @@
 
     <!-- 编辑、新增弹窗 -->
     <form-dialog ref="formDialogRef" @refresh="getDataList(false)" />
-
-
   </div>
 </template>
 
@@ -213,7 +202,7 @@ const FormDialog = defineAsyncComponent(() => import('./form.vue'));
 #set($void=$fieldDict.add($field.fieldDict))
 #end
 #end
-#if($fieldDict)
+#if($fieldDict && $fieldDict.size() > 0)
 // 加载字典数据
 const { $dict.format($fieldDict) } = useDict($dict.quotation($fieldDict));
 #end
@@ -226,7 +215,6 @@ const queryRef = ref();               // 查询表单引用
 const showSearch = ref(true);         // 是否显示搜索区域
 const selectObjs = ref([]) as any;    // 表格多选数据
 const multiple = ref(true);           // 是否多选
-const isExpandAll = ref(false);       // 是否展开所有节点
 
 // ========== 表格状态 ==========
 const state: BasicTableProps = reactive<BasicTableProps>({
@@ -236,7 +224,6 @@ const state: BasicTableProps = reactive<BasicTableProps>({
   loading: false,     // 加载状态
   dataList: []        // 数据列表
 });
-
 
 // ========== Hook引用 ==========
 // 表格相关Hook (树形表格不使用分页)
@@ -259,20 +246,11 @@ const resetQuery = () => {
 };
 
 /**
- * 展开/折叠所有节点
- */
-const expandAll = () => {
-  isExpandAll.value = !isExpandAll.value;
-};
-
-
-
-/**
  * 表格多选事件处理
  * @param objs 选中的数据行
  */
-const selectionChangHandle = (objs: { $pk.attrName: string }[]) => {
-  selectObjs.value = objs.map(({ $pk.attrName }) => $pk.attrName);
+const selectionChangHandle = (objs: { ${pk.attrName}: string }[]) => {
+  selectObjs.value = objs.map(({ ${pk.attrName} }) => ${pk.attrName});
   multiple.value = !objs.length;
 };
 
