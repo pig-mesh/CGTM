@@ -196,19 +196,4 @@ public class ${ClassName}Controller {
     public R importExcel(@RequestExcel List<${ClassName}Entity> ${className}List, BindingResult bindingResult) {
         return R.ok(${className}Service.saveBatch(${className}List));
     }
-
-    /**
-     * 获取所有父级节点
-     * @return R
-     */
-    @Operation(summary = "获取所有父级节点" , description = "获取所有父级节点" )
-    @GetMapping("/parent" )
-    #if($isSpringBoot3)
-    @HasPermission("${moduleName}_${functionName}_view")
-    #else
-    @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_view')" )
-    #end
-    public R getParentNodes() {
-        return R.ok(${className}Service.getParentNodes());
-    }
 } 

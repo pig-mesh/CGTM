@@ -80,32 +80,6 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
     }
 
     /**
-     * 获取所有父级节点
-     * @return 父级节点列表
-     */
-    @Override
-    public List<${ClassName}Entity> getParentNodes() {
-        LambdaQueryWrapper<${ClassName}Entity> wrapper = Wrappers.lambdaQuery();
-        // 查询所有父级节点（parentId为null或0的节点）
-        wrapper.and(w -> w.isNull(${ClassName}Entity::$str.getProperty($parentField)).or().eq(${ClassName}Entity::$str.getProperty($parentField), 0));
-        wrapper.orderByAsc(${ClassName}Entity::$str.getProperty($pk.attrName)); // 按主键排序
-        return list(wrapper);
-    }
-
-    /**
-     * 根据父ID获取子节点
-     * @param parentId 父级ID
-     * @return 子节点列表
-     */
-    @Override
-    public List<${ClassName}Entity> getChildrenByParentId(${pk.attrType} parentId) {
-        LambdaQueryWrapper<${ClassName}Entity> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(${ClassName}Entity::$str.getProperty($parentField), parentId);
-        wrapper.orderByAsc(${ClassName}Entity::$str.getProperty($pk.attrName)); // 按主键排序
-        return list(wrapper);
-    }
-
-    /**
      * 递归删除节点及其子节点
      * @param ids 要删除的节点ID列表
      * @return 删除结果

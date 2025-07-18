@@ -23,19 +23,6 @@ public interface ${ClassName}Service extends IService<${ClassName}Entity> {
     List<Tree<${pk.attrType}>> buildTree(LambdaQueryWrapper<${ClassName}Entity> wrapper);
 
     /**
-     * 获取所有父级节点
-     * @return 父级节点列表
-     */
-    List<${ClassName}Entity> getParentNodes();
-
-    /**
-     * 根据父ID获取子节点
-     * @param parentId 父级ID
-     * @return 子节点列表
-     */
-    List<${ClassName}Entity> getChildrenByParentId(${pk.attrType} parentId);
-
-    /**
      * 递归删除节点及其子节点
      * @param ids 要删除的节点ID列表
      * @return 删除结果

@@ -1,6 +1,6 @@
 <template>
   <el-dialog :title="form.${pk.attrName} ? '编辑' : '新增'" v-model="visible"
-    :close-on-click-modal="false" draggable destroy-on-close>
+    :close-on-click-modal="false" draggable>
     <el-form ref="dataFormRef" :model="form" :rules="dataRules" formDialogRef label-width="90px" v-loading="loading">
       <el-row :gutter="24">
         <!-- 父级节点选择 -->
@@ -19,6 +19,7 @@
               placeholder="请选择父级节点"
               style="width: 100%"
               clearable
+              filterable
             />
           </el-form-item>
         </el-col>
@@ -125,7 +126,7 @@
 <script setup lang="ts" name="${ClassName}TreeDialog">
 // ========== 导入语句 ==========
 import { useMessage } from "/@/hooks/message";
-import { getObj, addObj, putObj, getParentNodes } from '/@/api/${moduleName}/${functionName}';
+import { getObj, addObj, putObj, fetchTreeList } from '/@/api/${moduleName}/${functionName}';
 #if($fieldDict && $fieldDict.size() > 0)
 import { useDict } from '/@/hooks/dict';
 #end
@@ -284,22 +285,6 @@ const get${ClassName}Data = async (id: string) => {
   }
 };
 
-/**
- * 获取父级节点数据
- */
-const getParentNodesList = async () => {
-  try {
-    const { data } = await getParentNodes();
-    // 添加根节点选项
-    parentNodes.value = [
-      { ${pk.attrName}: 0, ${nameField.attrName}: '根节点', children: [] },
-      ...(data || [])
-    ];
-  } catch (error) {
-    console.error('获取父级节点失败:', error);
-    parentNodes.value = [{ ${pk.attrName}: 0, ${nameField.attrName}: '根节点', children: [] }];
-  }
-};
 
 /**
  * 打开弹窗方法
@@ -307,12 +292,12 @@ const getParentNodesList = async () => {
  * @param parentId 新增时的父级ID
  */
 const openDialog = async (id?: string, parentId?: string | number) => {
-  form.${pk.attrName} = '';
   visible.value = true;
+  form.${pk.attrName} = '';
   form.${parentField} = parentId || '0';
 
   // 初始化父级节点数据
-  const { data } = await getParentNodes();
+  const { data } = await fetchTreeList();
   parentNodes.value = [{ ${pk.attrName}: '0', ${nameField.attrName}: '根节点', children: data }];
 
   // 重置表单验证

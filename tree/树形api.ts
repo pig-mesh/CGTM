@@ -67,29 +67,6 @@ export function putObj(obj?: Object) {
   })
 }
 
-/**
- * 获取所有父级节点
- * @returns Promise<父级节点列表>
- */
-export function getParentNodes() {
-  return request({
-    url: '/${moduleName}/${functionName}/parent',
-    method: 'get'
-  })
-}
-
-/**
- * 根据父ID获取子节点
- * @param parentId - 父级ID
- * @returns Promise<子节点列表>
- */
-export function getChildrenByParentId(parentId: string | number) {
-  return request({
-    url: '/${moduleName}/${functionName}/children',
-    method: 'get',
-    params: { parentId }
-  })
-}
 
 // ========== 工具函数 ==========
 

@@ -1,7 +1,7 @@
 <template>
   <el-dialog :title="form.${pk.attrName} ? '编辑' : '新增'" v-model="visible"
     :close-on-click-modal="false" draggable>
-    <el-form ref="dataFormRef" :model="form" :rules="dataRules" formDialogRef label-width="90px" v-loading="loading">
+    <el-form ref="dataFormRef" :model="form" :rules="dataRules" label-width="90px" v-loading="loading">
       <el-row :gutter="24">
 #foreach($field in $formList)
 #if($field.attrName != ${pk.attrName})
