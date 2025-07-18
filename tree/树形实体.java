@@ -6,16 +6,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.FieldNameConstants;
-
 #if($isTenant)
 import ${package}.common.core.util.TenantTable;
 #end
-
-#foreach($pkg in $importList)
-import $pkg;
+#foreach($import in $importList)
+import $import;
 #end
-
-import java.time.LocalDateTime;
 
 /**
  * ${tableComment}
@@ -27,37 +23,21 @@ import java.time.LocalDateTime;
 #if($isTenant)
 @TenantTable
 #end
+@FieldNameConstants
 @TableName("${tableName}")
 @EqualsAndHashCode(callSuper = true)
-@FieldNameConstants
 @Schema(description = "${tableComment}")
 public class ${ClassName}Entity extends Model<${ClassName}Entity> {
 
 #foreach ($field in $fieldList)
-#if($field.primaryPk)
+#if(${field.fieldComment})#set($comment=${field.fieldComment})#else #set($comment=${field.attrName})#end
+
 	/**
-	 * $field.fieldComment
-	 */
-	@TableId(type = IdType.ASSIGN_ID)
-	@Schema(description = "$field.fieldComment")
-	private $field.attrType $field.attrName;
-
+	* $comment
+	*/
+#if($field.primaryPk == '1')
+    @TableId(type = IdType.ASSIGN_ID)
 #end
-#end
-#foreach ($field in $fieldList)
-#if(!$field.primaryPk && !$field.baseField)
-	/**
-	 * $field.fieldComment
-	 */
-#if($field.fieldComment == '父级ID')
-	@Schema(description = "$field.fieldComment")
-	private $field.attrType parentId;
-
-#elseif($field.attrName == 'sort')
-	@Schema(description = "排序")
-	private Integer sort;
-
-#else
 #if($field.autoFill == 'INSERT')
 	@TableField(fill = FieldFill.INSERT)
 #elseif($field.autoFill == 'INSERT_UPDATE')
@@ -65,25 +45,15 @@ public class ${ClassName}Entity extends Model<${ClassName}Entity> {
 #elseif($field.autoFill == 'UPDATE')
 	@TableField(fill = FieldFill.UPDATE)
 #end
-	@Schema(description = "$field.fieldComment"#if($field.hidden), hidden = $field.hidden#end)
-	private $field.attrType $field.attrName;
-
+#if($field.fieldName == 'del_flag')
+    @TableLogic
+	@TableField(fill = FieldFill.INSERT)
 #end
+    @Schema(description="$comment"#if($field.hidden),hidden=$field.hidden#end)
+#if($field.formType == 'checkbox')
+    private ${field.attrType}[] $field.attrName;
+#else
+    private $field.attrType $field.attrName;
+#end    
 #end
-#end
-
-	/**
-	 * 子节点列表
-	 */
-	@TableField(exist = false)
-	@Schema(description = "子节点列表", hidden = true)
-	private java.util.List<${ClassName}Entity> children;
-
-	/**
-	 * 是否有子节点
-	 */
-	@TableField(exist = false)
-	@Schema(description = "是否有子节点", hidden = true)
-	private Boolean hasChildren;
-
-} 
+}
