@@ -5,7 +5,7 @@ on:
     branches:
       - master 
       - next
-      - dev
+      - tree
 
 jobs:
   sync-repo:
