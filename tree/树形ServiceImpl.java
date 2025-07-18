@@ -65,24 +65,18 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
     private Function<${ClassName}Entity, TreeNode<${pk.attrType}>> getNodeFunction() {
         return entity -> {
             TreeNode<${pk.attrType}> node = new TreeNode<>();
-            node.setId(entity.get${str.capitalizeFirst($pk.attrName)}());
+            node.setId(entity.$str.getProperty($pk.attrName)());
 #foreach($field in $fieldList)
 #if($field.attrName == 'name' || $field.fieldComment.contains('名称'))
             node.setName(entity.get${str.capitalizeFirst($field.attrName)}());
 #end
 #end
-#if($pk.attrType == 'Long')
             node.setParentId(entity.getParentId() != null ? entity.getParentId() : 0L);
-#else
-            node.setParentId(entity.getParentId() != null ? entity.getParentId() : 0);
-#end
 
             // 扩展属性
             Map<String, Object> extra = new HashMap<>();
 #foreach($field in $fieldList)
-#if(!$field.primaryPk && $field.attrName != 'parentId')
-            extra.put(${ClassName}Entity.Fields.${field.attrName}, entity.get${str.capitalizeFirst($field.attrName)}());
-#end
+            extra.put(${ClassName}Entity.Fields.${field.attrName}, entity.$str.getProperty($field.attrName)());
 #end
             
             node.setExtra(extra);
