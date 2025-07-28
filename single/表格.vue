@@ -139,6 +139,20 @@
             <dict-tag :options="$field.fieldDict" :value="scope.row.${field.attrName}" />
           </template>
         </el-table-column>
+#elseif($field.formType == 'upload-img')
+        <el-table-column prop="${field.attrName}" label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" width="120">
+          <template #default="scope">
+            <el-image 
+              v-if="scope.row.${field.attrName}"
+              :src="scope.row.${field.attrName}" 
+              :preview-src-list="[scope.row.${field.attrName}]"
+              fit="cover"
+              class="w-20 h-20 rounded"
+              :preview-teleported="true"
+            />
+            <span v-else class="text-gray-400">暂无图片</span>
+          </template>
+        </el-table-column>
 #else
         <el-table-column 
           prop="${field.attrName}" 
