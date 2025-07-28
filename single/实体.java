@@ -52,7 +52,6 @@ public class ${ClassName}Entity extends Model<${ClassName}Entity> {
     @Schema(description="$comment"#if($field.hidden),hidden=$field.hidden#end)
 #if($field.formType == 'checkbox')
     private ${field.attrType}[] $field.attrName;
-#end
 #else
 #if($field.fieldType == 'date')
     private LocalDate $field.attrName;
