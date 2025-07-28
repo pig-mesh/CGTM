@@ -39,6 +39,28 @@
               :value-format="dateTimeStr"
             />
           </el-form-item>
+#elseif($field.queryFormType == 'date-range')
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}Range">
+            <el-date-picker 
+              type="daterange" 
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+              v-model="state.queryForm.${field.attrName}Range"
+              :value-format="dateStr"
+              range-separator="至"
+            />
+          </el-form-item>
+#elseif($field.queryFormType == 'datetime-range')
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}Range">
+            <el-date-picker 
+              type="datetimerange" 
+              start-placeholder="开始时间"
+              end-placeholder="结束时间"
+              v-model="state.queryForm.${field.attrName}Range"
+              :value-format="dateTimeStr"
+              range-separator="至"
+            />
+          </el-form-item>
 #elseif($field.formType == 'radio')
           <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
             <el-radio-group v-model="state.queryForm.${field.attrName}">

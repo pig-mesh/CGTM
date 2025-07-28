@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 #end
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -76,7 +77,18 @@ public class ${ClassName}Controller {
 #else
 #set($expression="Objects.nonNull")
 #end
-#if($field.queryType == '=')
+#if($field.queryFormType == 'date-range' || $field.queryFormType == 'datetime-range')
+		// ${field.fieldComment}范围查询
+		if (ArrayUtil.isNotEmpty(${className}.get${field.attrName.substring(0,1).toUpperCase()}${field.attrName.substring(1)}Range())) {
+			String[] range = ${className}.get${field.attrName.substring(0,1).toUpperCase()}${field.attrName.substring(1)}Range();
+			if (StrUtil.isNotBlank(range[0])) {
+				wrapper.ge(${ClassName}Entity::$getAttrName, range[0]);
+			}
+			if (StrUtil.isNotBlank(range[1])) {
+				wrapper.le(${ClassName}Entity::$getAttrName, range[1]);
+			}
+		}
+#elseif($field.queryType == '=')
 		wrapper.eq($expression($var),${ClassName}Entity::$getAttrName,$var);
 #elseif( $field.queryType == 'like' )
 		wrapper.like($expression($var),${ClassName}Entity::$getAttrName,$var);

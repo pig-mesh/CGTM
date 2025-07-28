@@ -61,4 +61,15 @@ public class ${ClassName}Entity extends Model<${ClassName}Entity> {
     @TableField(exist = false)
     @EntityMapping(thisField = "$mainField", joinField = "$childField")
     private List<${ChildClassName}Entity> ${childClassName}List;
+
+#foreach ($field in $queryList)
+#if($field.queryFormType == 'date-range' || $field.queryFormType == 'datetime-range')
+	/**
+	* ${field.fieldComment}范围查询
+	*/
+	@TableField(exist = false)
+    @Schema(description="${field.fieldComment}范围查询", hidden=true)
+    private String[] ${field.attrName}Range;
+#end
+#end
 }

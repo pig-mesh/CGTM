@@ -63,6 +63,16 @@
             <el-date-picker type="datetime" placeholder="请选择#if(${field.fieldComment})${field.fieldComment}#else${field.fieldName}#end" v-model="form.${field.attrName}" :value-format="dateTimeStr"></el-date-picker>
           </el-form-item>
         </el-col>
+#elseif($field.formType == 'date-range')
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.fieldName}#end" prop="${field.attrName}Range">
+            <el-date-picker type="daterange" start-placeholder="开始日期" end-placeholder="结束日期" v-model="form.${field.attrName}Range" :value-format="dateStr" range-separator="至"></el-date-picker>
+          </el-form-item>
+        </el-col>
+#elseif($field.formType == 'datetime-range')
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.fieldName}#end" prop="${field.attrName}Range">
+            <el-date-picker type="datetimerange" start-placeholder="开始时间" end-placeholder="结束时间" v-model="form.${field.attrName}Range" :value-format="dateTimeStr" range-separator="至"></el-date-picker>
+          </el-form-item>
+        </el-col>
 #elseif($field.formType == 'number')
           <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.fieldName}#end" prop="${field.attrName}">
             <el-input-number :min="1" :max="1000" v-model="form.${field.attrName}" placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.fieldName}#end"></el-input-number>
@@ -157,6 +167,8 @@ const form = reactive({
   ${field.attrName}: 0, // ${field.fieldComment}
 #elseif($field.formType == 'checkbox')
   ${field.attrName}: [], // ${field.fieldComment}
+#elseif($field.formType == 'date-range' || $field.formType == 'datetime-range')
+  ${field.attrName}Range: [], // ${field.fieldComment}范围
 #else
   ${field.attrName}: '', // ${field.fieldComment}
 #end
