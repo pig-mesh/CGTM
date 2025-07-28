@@ -52,13 +52,7 @@ public class ${ChildClassName}Entity extends Model<${ChildClassName}Entity> {
 #if($field.formType == 'checkbox')
    private ${field.attrType}[] $field.attrName;
 #else
-#if($field.fieldType == 'date')
-   private LocalDate $field.attrName;
-#elseif($field.fieldType == 'datetime')
-   private LocalDateTime $field.attrName;
-#else
    private $field.attrType $field.attrName;
-#end
 #end 
 #end
 }
