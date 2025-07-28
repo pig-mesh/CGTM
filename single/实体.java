@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.activerecord.Model;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 #if($isTenant)
 import ${package}.common.core.util.TenantTable;
 #end
@@ -50,8 +52,15 @@ public class ${ClassName}Entity extends Model<${ClassName}Entity> {
     @Schema(description="$comment"#if($field.hidden),hidden=$field.hidden#end)
 #if($field.formType == 'checkbox')
     private ${field.attrType}[] $field.attrName;
+#end
+#else
+#if($field.fieldType == 'date')
+    private LocalDate $field.attrName;
+#elseif($field.fieldType == 'datetime')
+    private LocalDateTime $field.attrName;
 #else
     private $field.attrType $field.attrName;
+#end
 #end    
 #end
 

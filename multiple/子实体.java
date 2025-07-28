@@ -3,6 +3,8 @@ package ${package}.${moduleName}.entity;
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 #if($isChildTenant)
 import ${package}.common.core.util.TenantTable;
 #end
@@ -49,8 +51,15 @@ public class ${ChildClassName}Entity extends Model<${ChildClassName}Entity> {
 	@Schema(description="$comment"#if($field.hidden),hidden=$field.hidden#end)
 #if($field.formType == 'checkbox')
    private ${field.attrType}[] $field.attrName;
+#end
+#else
+#if($field.fieldType == 'date')
+   private LocalDate $field.attrName;
+#elseif($field.fieldType == 'datetime')
+   private LocalDateTime $field.attrName;
 #else
    private $field.attrType $field.attrName;
+#end
 #end 
 #end
 }
