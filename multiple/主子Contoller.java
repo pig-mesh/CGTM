@@ -5,8 +5,22 @@ import cn.hutool.core.util.StrUtil;
 #end
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.date.DateUtil;
+#set($hasDateRange = false)
+#set($hasDateTimeRange = false)
+#foreach($field in $queryList)
+#if($field.queryFormType == 'date-range')
+#set($hasDateRange = true)
+#end
+#if($field.queryFormType == 'datetime-range')
+#set($hasDateTimeRange = true)
+#end
+#end
+#if($hasDateRange)
 import java.time.LocalDate;
+#end
+#if($hasDateTimeRange)
 import java.time.LocalDateTime;
+#end
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;

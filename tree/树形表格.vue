@@ -30,6 +30,16 @@
               :value-format="dateStr"
             />
           </el-form-item>
+#elseif($field.queryFormType == 'date-range')
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}Range">
+            <el-date-picker 
+              type="daterange" 
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+              v-model="state.queryForm.${field.attrName}Range"
+              value-format="YYYY-MM-DD"
+            />
+          </el-form-item>
 #elseif($field.queryFormType == 'datetime')
           <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
             <el-date-picker 
@@ -37,6 +47,16 @@
               placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" 
               v-model="state.queryForm.${field.attrName}"
               :value-format="dateTimeStr"
+            />
+          </el-form-item>
+#elseif($field.queryFormType == 'datetime-range')
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}Range">
+            <el-date-picker 
+              type="datetimerange" 
+              start-placeholder="开始时间"
+              end-placeholder="结束时间"
+              v-model="state.queryForm.${field.attrName}Range"
+              value-format="YYYY-MM-DD HH:mm:ss"
             />
           </el-form-item>
 #elseif($field.formType == 'radio')
@@ -140,6 +160,19 @@
         <el-table-column prop="${field.attrName}" label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" show-overflow-tooltip>
           <template #default="scope">
             <dict-tag :options="${field.fieldDict}" :value="scope.row.${field.attrName}" />
+          </template>
+        </el-table-column>
+#elseif($field.formType == 'upload-img')
+        <el-table-column prop="${field.attrName}" label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" width="120">
+          <template #default="scope">
+            <el-image 
+              v-if="scope.row.${field.attrName}"
+              :src="baseURL + scope.row.${field.attrName}" 
+              fit="cover"
+              class="w-20 h-20 rounded"
+              :preview-teleported="true"
+            />
+            <span v-else class="text-gray-400">暂无图片</span>
           </template>
         </el-table-column>
 #else
