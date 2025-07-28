@@ -50,7 +50,11 @@ public class ${ClassName}Entity extends Model<${ClassName}Entity> {
 	@TableField(fill = FieldFill.INSERT)
 #end
     @Schema(description="$comment"#if($field.hidden),hidden=$field.hidden#end)
-#if($field.formType == 'checkbox')
+#if($field.fieldType == 'date')
+    private LocalDate $field.attrName;
+#elseif($field.fieldType == 'datetime')
+    private LocalDateTime $field.attrName;
+#elseif($field.formType == 'checkbox')
     private ${field.attrType}[] $field.attrName;
 #else
     private $field.attrType $field.attrName;

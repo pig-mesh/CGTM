@@ -166,8 +166,7 @@
           <template #default="scope">
             <el-image 
               v-if="scope.row.${field.attrName}"
-              :src="scope.row.${field.attrName}" 
-              :preview-src-list="[scope.row.${field.attrName}]"
+              :src="baseURL + scope.row.${field.attrName}" 
               fit="cover"
               class="w-20 h-20 rounded"
               :preview-teleported="true"

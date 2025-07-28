@@ -6,6 +6,8 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -77,15 +79,26 @@ public class ${ClassName}Controller {
 #else
 #set($expression="Objects.nonNull")
 #end
-#if($field.queryFormType == 'date-range' || $field.queryFormType == 'datetime-range')
+#if($field.queryFormType == 'date-range')
 		// ${field.fieldComment}范围查询
 		if (ArrayUtil.isNotEmpty(${className}.get${field.attrName.substring(0,1).toUpperCase()}${field.attrName.substring(1)}Range())) {
 			String[] range = ${className}.get${field.attrName.substring(0,1).toUpperCase()}${field.attrName.substring(1)}Range();
 			if (StrUtil.isNotBlank(range[0])) {
-				wrapper.ge(${ClassName}Entity::$getAttrName, range[0]);
+				wrapper.ge(${ClassName}Entity::$getAttrName, LocalDate.parse(range[0]));
 			}
 			if (StrUtil.isNotBlank(range[1])) {
-				wrapper.le(${ClassName}Entity::$getAttrName, range[1]);
+				wrapper.le(${ClassName}Entity::$getAttrName, LocalDate.parse(range[1]));
+			}
+		}
+#elseif($field.queryFormType == 'datetime-range')
+		// ${field.fieldComment}范围查询
+		if (ArrayUtil.isNotEmpty(${className}.get${field.attrName.substring(0,1).toUpperCase()}${field.attrName.substring(1)}Range())) {
+			String[] range = ${className}.get${field.attrName.substring(0,1).toUpperCase()}${field.attrName.substring(1)}Range();
+			if (StrUtil.isNotBlank(range[0])) {
+				wrapper.ge(${ClassName}Entity::$getAttrName, LocalDateTime.parse(range[0]));
+			}
+			if (StrUtil.isNotBlank(range[1])) {
+				wrapper.le(${ClassName}Entity::$getAttrName, LocalDateTime.parse(range[1]));
 			}
 		}
 #elseif($field.queryType == '=')
