@@ -89,7 +89,7 @@
             icon="Delete" 
             type="primary"
             v-auth="'${moduleName}_${functionName}_del'" 
-            @click="handleDelete(selectObjs)">
+            @click="handleDelete(selectObjs.value)">
             删除
           </el-button>
           <right-toolbar 
@@ -233,7 +233,7 @@ const resetQuery = () => {
 
 // 导出excel
 const exportExcel = () => {
-  downBlobFile('/${moduleName}/${functionName}/export', Object.assign(state.queryForm, { ids: selectObjs }), '${functionName}.xlsx');
+  downBlobFile('/${moduleName}/${functionName}/export', Object.assign(state.queryForm, { ids: selectObjs.value }), '${functionName}.xlsx');
 };
 
 // 多选事件

@@ -105,7 +105,7 @@
             icon="Delete" 
             type="primary"
             v-auth="'${moduleName}_${functionName}_del'" 
-            @click="handleDelete(selectObjs)"
+            @click="handleDelete(selectObjs.value)"
           >
             删除
           </el-button>
@@ -270,7 +270,7 @@ const resetQuery = () => {
 const exportExcel = () => {
   downBlobFile(
     '/${moduleName}/${functionName}/export',
-    Object.assign(state.queryForm, { ids: selectObjs }),
+    Object.assign(state.queryForm, { ids: selectObjs.value }),
     '${functionName}.xlsx'
   );
 };
