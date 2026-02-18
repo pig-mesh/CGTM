@@ -270,7 +270,7 @@ const resetQuery = () => {
 const exportExcel = () => {
   downBlobFile(
     '/${moduleName}/${functionName}/export',
-    Object.assign(state.queryForm, { ids: selectObjs.value }),
+    { ...state.queryForm, ids: selectObjs.value },
     '${functionName}.xlsx'
   );
 };

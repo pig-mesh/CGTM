@@ -233,7 +233,7 @@ const resetQuery = () => {
 
 // 导出excel
 const exportExcel = () => {
-  downBlobFile('/${moduleName}/${functionName}/export', Object.assign(state.queryForm, { ids: selectObjs.value }), '${functionName}.xlsx');
+  downBlobFile('/${moduleName}/${functionName}/export', { ...state.queryForm, ids: selectObjs.value }, '${functionName}.xlsx');
 };
 
 // 多选事件
