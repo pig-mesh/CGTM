@@ -51,7 +51,6 @@ public class ${ClassName}Entity extends Model<${ClassName}Entity> {
 #if($field.formType == 'checkbox')
     private ${field.attrType}[] $field.attrName;
 #elseif($field.formType == 'daterange' || $field.formType == 'datetimerange')
-    @TableField(typeHandler = JacksonTypeHandler.class)
     private String[] $field.attrName;
 #else
     private $field.attrType $field.attrName;
