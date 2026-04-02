@@ -1,50 +1,103 @@
-# 代码生成模板市场
+## 代码生成原理
 
-![1694686202](https://minio.pigx.top/oss/202309/1694686202.jpg)
+当开发者选中某张表进行代码生成时，如下图所示，首先会注入 PIGX 定义好的 Velocity 模板（开发平台 > 模板管理）。然后查询此表的相关元信息（字段、注释）并注入。最终使用 Velocity 渲染出相关文本。
 
-CGTM（代码生成模板市场）是一个在线平台，旨在为开发者提供更好的开发体验，提供各种代码生成模板。
+<img src="https://minio.pigx.top/oss/202306/1685858464.jpg" alt="代码生成原理示意图" width="100%" />
 
-只需在点击"在线更新"按钮，即可轻松获取最新的代码生成模板。
+## Velocity 模板基础
 
-开发者也可以通过GitHub的pull request机制提交自己的模板，为社区贡献力量。
+<Tip title="学习资源">
+参考 <a href="https://juejin.cn/post/7034112895277498404" target="_blank">Velocity 基本语法说明</a> 了解模板语法。
+</Tip>
 
-## 特点
+Entity 实体生成的模板代码：
 
-- **丰富多样的模板**：CGTM提供了丰富多样的代码生成模板，涵盖了各种编程语言、框架和开发场景。无论您是进行Web开发、移动应用程序开发还是其他类型的软件项目，都可以找到适合您需求的模板。
+```java
+public class ${ClassName}Entity extends Model<${ClassName}Entity> {
 
-- **简便的更新**：跟上最新的编码实践和技术进展可能是一项具有挑战性的任务。CGTM通过提供"在线更新"功能简化了这一过程。通过使用此功能，开发者可以轻松获取最新的代码生成模板，无需手动搜索更新。
+#foreach ($field in $fieldList)
+#if($field.primaryPk)
+    @TableId(type = IdType.ASSIGN_ID)
+#end
+    @Schema(description="$comment"#if($field.hidden),hidden=$field.hidden#end)
+    private $field.attrType $field.attrName;
+#end
+}
+```
 
-- **社区贡献**：CGTM欢迎来自各方背景的开发者共同贡献代码生成模板。这种开放的合作方式让平台能够不断扩大模板库，满足开发者社区的多样化需求。
+<img src="https://minio.pigx.top/oss/202306/1685859452.png" alt="模板示例" width="100%" />
 
-## 如何使用
+## 上下文元信息
 
-1. 访问PIGX【代码生成】-> 【元数据】-> 【模板管理】点击"在线更新"按钮。
-2. 单击"在线更新"按钮，将您本地的模板与最新版本同步。
-3. 浏览可用的模板，并选择最适合当前开发需求的模板。
-4. 按照每个模板提供的说明生成所需的代码片段或项目结构。
-5. 享受代码生成带来的便利和效率，提升开发工作流程。
+如下属性可在 Velocity 模板中直接使用相关语法进行取值。
 
-## 贡献
+### 模板基本属性
 
-我们鼓励开发者通过GitHub的pull request提交自己的代码生成模板，为CGTM做出贡献。通过这样做，您可以帮助扩大仓库的规模，并帮助其他人进行编码工作。
+| Key            | Description        |
+| -------------- | ------------------ |
+| dbType         | 数据库类型         |
+| package        | 包名               |
+| packagePath    | 包路径             |
+| version        | 版本               |
+| moduleName     | 模块名             |
+| ModuleName     | 模块名首字母大写   |
+| functionName   | 功能名             |
+| FunctionName   | 功能名首字母大写   |
+| formLayout     | 表单布局           |
+| style          | 样式，对应的模板组 |
+| author         | 作者               |
+| datetime       | 当前日期和时间     |
+| date           | 当前日期           |
+| importList     | 导入列表           |
+| tableName      | 数据库表名         |
+| tableComment   | 数据库表注释       |
+| className      | 类名的小写形式     |
+| ClassName      | 类名               |
+| fieldList      | 字段列表           |
+| backendPath    | 后端路径           |
+| frontendPath   | 前端路径           |
+| childFieldList | 子表字段列表       |
+| childTableName | 子表名             |
+| mainField      | 主表关联字段名称   |
+| childField     | 子表关联字段名称   |
+| ChildClassName | 子类名首字母大写   |
+| childClassName | 子类名的小写形式   |
+| primaryList    | 主键字段列表       |
+| formList       | 表单字段列表       |
+| gridList       | 表格字段列表       |
+| queryList      | 查询字段列表       |
+| pk             | 主键字段           |
 
-要进行贡献，请按照以下步骤进行：
+### 模板字段属性
 
-1. 在GitHub上Fork CGTM仓库。
-2. 创建一个新的分支，用于开发您的代码生成模板。
-3. 根据我们的贡献文档中的指南开发您的代码生成模板。
-4. 提交一个pull request，包括清晰的模板描述和文档。
-5. 您的模板将由CGTM团队进行审核，在批准后合并到主仓库中。
+| Key           | Description    |
+| ------------- | -------------- |
+| dsName        | 数据源名       |
+| tableName     | 表名称         |
+| fieldName     | SQL 字段名称   |
+| fieldType     | SQL 字段类型   |
+| attrName      | Java 属性名    |
+| attrType      | Java 属性类型  |
+| fieldComment  | 字段说明       |
+| sort          | 排序           |
+| packageName   | 属性包名       |
+| autoFill      | 自动填充       |
+| primaryPk     | 是否为主键     |
+| baseField     | 是否为基类字段 |
+| formItem      | 是否为表单项   |
+| formRequired  | 表单必填       |
+| formType      | 表单类型       |
+| formValidator | 表单效验       |
+| gridItem      | 是否为列表项   |
+| gridSort      | 列表排序       |
+| queryItem     | 是否为查询项   |
+| queryType     | 查询方式       |
+| queryFormType | 查询表单类型   |
+| fieldDict     | 字段字典类型   |
 
-## 许可证
+### 环境判断属性
 
-CGTM在[AGPL 3.0 许可证](https://github.com/pig-mesh/CGTM/blob/master/LICENSE)下发布。根据许可证中指定的条款，此类只对PIGX用户免费开放使用。
-
-## 支持
-
-如果您遇到任何问题或对CGTM有任何疑问，请通过[sw@pigx.vip](mailto:sw@pigx.top)与我们联系。我们将提供帮助，并确保平台的正常运行。
-
-让我们共同合作，通过CGTM使编码更高效、更愉悦！
-
-
-**免责声明：** 请注意，CGTM是一个社区驱动的平台，不对提供的模板功能或准确性负责。用户在将生成的代码应用于项目之前，请务必仔细审查和验证。
+| Key           | Description        |
+| ------------- | ------------------ |
+| isSpringBoot3 | 是否是 springboot3 |
+| isTenant      | 是否支持多租户     |
