@@ -11,7 +11,7 @@ import ${package}.common.core.util.TenantTable;
 #foreach($import in $importList)
 import $import;
 #end
-import cn.idev.excel..annotation.ExcelIgnore;
+import cn.idev.excel.annotation.ExcelIgnore;
 import com.github.yulichang.annotation.EntityMapping;
 import java.util.List;
 
@@ -53,9 +53,24 @@ public class ${ClassName}Entity extends Model<${ClassName}Entity> {
     @Schema(description="$comment"#if($field.hidden),hidden=$field.hidden#end)
 #if($field.formType == 'checkbox')
     private ${field.attrType}[] $field.attrName;
+#elseif($field.formType == 'daterange' || $field.formType == 'datetimerange')
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private String[] $field.attrName;
 #else
     private $field.attrType $field.attrName;
-#end    
+#end
+#end
+#foreach ($field in $queryList)
+#if($field.queryFormType == 'daterange' || $field.queryFormType == 'datetimerange')
+#if(${field.fieldComment})#set($comment=${field.fieldComment})#else #set($comment=${field.attrName})#end
+
+	/**
+	* $comment 查询范围
+	*/
+    @TableField(exist = false)
+    @Schema(description="$comment 查询范围",hidden=true)
+    private String[] ${field.attrName}Range;
+#end
 #end
     @ExcelIgnore
     @TableField(exist = false)

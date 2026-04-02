@@ -22,21 +22,43 @@
           </el-form-item>
 #elseif($field.queryFormType == 'date')
           <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
-            <el-date-picker 
-              type="date" 
-              placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" 
+            <el-date-picker
+              type="date"
+              placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end"
               :value-format="dateStr"
-              v-model="state.queryForm.${field.attrName}">
-            </el-date-picker>
+              v-model="state.queryForm.${field.attrName}"
+            />
+          </el-form-item>
+#elseif($field.queryFormType == 'daterange')
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}Range">
+            <el-date-picker
+              type="daterange"
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+              v-model="state.queryForm.${field.attrName}Range"
+              :value-format="dateStr"
+            />
           </el-form-item>
 #elseif($field.queryFormType == 'datetime')
           <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
-            <el-date-picker 
-              type="datetime" 
-              placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" 
+            <el-date-picker
+              type="datetime"
+              placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end"
               :value-format="dateTimeStr"
-              v-model="state.queryForm.${field.attrName}">
-            </el-date-picker>
+              v-model="state.queryForm.${field.attrName}"
+            />
+          </el-form-item>
+#elseif($field.queryFormType == 'datetimerange')
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}Range">
+            <el-date-picker
+              type="datetimerange"
+              range-separator="至"
+              start-placeholder="开始时间"
+              end-placeholder="结束时间"
+              v-model="state.queryForm.${field.attrName}Range"
+              :value-format="dateTimeStr"
+            />
           </el-form-item>
 #elseif($field.formType == 'radio')
           <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">

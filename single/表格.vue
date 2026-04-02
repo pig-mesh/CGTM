@@ -23,19 +23,41 @@
           </el-form-item>
 #elseif($field.queryFormType == 'date')
           <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
-            <el-date-picker 
-              type="date" 
-              placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" 
+            <el-date-picker
+              type="date"
+              placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end"
               v-model="state.queryForm.${field.attrName}"
+              :value-format="dateStr"
+            />
+          </el-form-item>
+#elseif($field.queryFormType == 'daterange')
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}Range">
+            <el-date-picker
+              type="daterange"
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+              v-model="state.queryForm.${field.attrName}Range"
               :value-format="dateStr"
             />
           </el-form-item>
 #elseif($field.queryFormType == 'datetime')
           <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
-            <el-date-picker 
-              type="datetime" 
-              placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" 
+            <el-date-picker
+              type="datetime"
+              placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end"
               v-model="state.queryForm.${field.attrName}"
+              :value-format="dateTimeStr"
+            />
+          </el-form-item>
+#elseif($field.queryFormType == 'datetimerange')
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}Range">
+            <el-date-picker
+              type="datetimerange"
+              range-separator="至"
+              start-placeholder="开始时间"
+              end-placeholder="结束时间"
+              v-model="state.queryForm.${field.attrName}Range"
               :value-format="dateTimeStr"
             />
           </el-form-item>
@@ -127,7 +149,7 @@
         border 
         :cell-style="tableStyle.cellStyle" 
         :header-cell-style="tableStyle.headerCellStyle"
-        @selection-change="selectionChangHandle"
+        @selection-change="selectionChangeHandle"
         @sort-change="sortChangeHandle"
       >
         <el-table-column type="selection" width="40" align="center" />
@@ -279,7 +301,7 @@ const exportExcel = () => {
  * 表格多选事件处理
  * @param objs 选中的数据行
  */
-const selectionChangHandle = (objs: { $pk.attrName: string }[]) => {
+const selectionChangeHandle = (objs: { $pk.attrName: string }[]) => {
   selectObjs.value = objs.map(({ $pk.attrName }) => $pk.attrName);
   multiple.value = !objs.length;
 };

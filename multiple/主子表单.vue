@@ -63,6 +63,16 @@
             <el-date-picker type="datetime" placeholder="请选择#if(${field.fieldComment})${field.fieldComment}#else${field.fieldName}#end" v-model="form.${field.attrName}" :value-format="dateTimeStr"></el-date-picker>
           </el-form-item>
         </el-col>
+#elseif($field.formType == 'daterange')
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.fieldName}#end" prop="${field.attrName}">
+            <el-date-picker type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" v-model="form.${field.attrName}" :value-format="dateStr"></el-date-picker>
+          </el-form-item>
+        </el-col>
+#elseif($field.formType == 'datetimerange')
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.fieldName}#end" prop="${field.attrName}">
+            <el-date-picker type="datetimerange" range-separator="至" start-placeholder="开始时间" end-placeholder="结束时间" v-model="form.${field.attrName}" :value-format="dateTimeStr"></el-date-picker>
+          </el-form-item>
+        </el-col>
 #elseif($field.formType == 'number')
           <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.fieldName}#end" prop="${field.attrName}">
             <el-input-number :min="1" :max="1000" v-model="form.${field.attrName}" placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.fieldName}#end"></el-input-number>
@@ -80,7 +90,7 @@
         </el-col>
 #elseif($field.formType == 'editor')
           <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.fieldName}#end" prop="${field.attrName}">
-            <editor v-model:get-html="form.${field.attrName}" placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.fieldName}#end"></editor>
+            <editor v-if="visible" v-model:get-html="form.${field.attrName}" placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.fieldName}#end"></editor>
           </el-form-item>
         </el-col>
 #else
@@ -155,7 +165,7 @@ const form = reactive({
 #foreach($field in $formList)
 #if($field.formType == 'number')
   ${field.attrName}: 0, // ${field.fieldComment}
-#elseif($field.formType == 'checkbox')
+#elseif($field.formType == 'checkbox' || $field.formType == 'daterange' || $field.formType == 'datetimerange')
   ${field.attrName}: [], // ${field.fieldComment}
 #else
   ${field.attrName}: '', // ${field.fieldComment}

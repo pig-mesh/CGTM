@@ -76,7 +76,9 @@ public class ${ClassName}Controller {
 #else
 #set($expression="Objects.nonNull")
 #end
-#if($field.queryType == '=')
+#if($field.queryFormType == 'daterange' || $field.queryFormType == 'datetimerange')
+		wrapper.between(ArrayUtil.isNotEmpty(${className}.${getAttrName}Range()),${ClassName}Entity::$getAttrName,${className}.${getAttrName}Range()[0],${className}.${getAttrName}Range()[1]);
+#elseif($field.queryType == '=')
 		wrapper.eq($expression($var),${ClassName}Entity::$getAttrName,$var);
 #elseif( $field.queryType == 'like' )
 		wrapper.like($expression($var),${ClassName}Entity::$getAttrName,$var);

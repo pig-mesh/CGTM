@@ -32,17 +32,21 @@ config.json   # 模板组配置 — 定义模板名称、源文件路径和生�
 
 模板在代码生成时可使用以下变量：
 
-**路径与模块：** `backendPath`, `frontendPath`, `packagePath`, `moduleName`, `functionName`
+**路径与模块：** `backendPath`, `frontendPath`, `packagePath`, `moduleName`, `ModuleName`（首字母大写）, `functionName`, `FunctionName`（首字母大写）
 
 **类与表：** `ClassName`/`className`, `tableName`, `tableComment`, `pk`（主键字段）
 
-**字段列表：** `fieldList`（全部字段）、`primaryList`、`formList`、`gridList`、`queryList`
+**包与版本：** `package`（包名）, `version`（版本）, `importList`（导入列表）, `author`（作者）, `datetime`（生成日期时间）, `date`（生成日期）
 
-**字段属性：** `fieldName`（SQL列名）、`attrName`/`attrType`（Java属性）、`fieldComment`、`primaryPk`、`autoFill`、`baseField`、`formItem`、`formRequired`、`formType`、`formValidator`、`gridItem`、`gridSort`、`queryItem`、`queryType`、`fieldDict`、`hidden`
+**样式与布局：** `formLayout`（表单布局，1=单列/2=双列）, `style`（模板组样式）, `dbType`（数据库类型）
+
+**字段列表：** `fieldList`（全部字段）、`primaryList`（主键字段列表）、`formList`（表单字段列表）、`gridList`（表格列字段列表）、`queryList`（查询字段列表）
+
+**字段属性：** `fieldName`（SQL列名）、`fieldType`（SQL字段类型）、`attrName`/`attrType`（Java属性名/类型）、`fieldComment`（字段注释）、`packageName`（属性包名）、`sort`（排序）、`primaryPk`（是否主键）、`autoFill`（自动填充，INSERT/INSERT_UPDATE/UPDATE）、`baseField`（是否基类字段）、`formItem`（是否表单项）、`formRequired`（表单必填）、`formType`（表单类型，text/textarea/select/radio/checkbox/date/datetime/daterange/datetimerange/number/upload-file/upload-img/editor）、`formValidator`（表单校验器）、`gridItem`（是否列表项）、`gridSort`（列表可排序）、`queryItem`（是否查询项）、`queryType`（查询方式，=/like/!=/>/</>=/<=等）、`queryFormType`（查询表单类型，select/date/daterange/datetime/datetimerange）、`fieldDict`（字典类型）、`hidden`（是否隐藏，用于@Schema）、`dsName`（数据源名）
 
 **主子表专用：** `childFieldList`、`childTableName`、`mainField`、`childField`、`ChildClassName`/`childClassName`
 
-**环境标志：** `isSpringBoot3`（Spring Boot 3.x 兼容）、`isTenant`（多租户支持）
+**环境标志：** `isSpringBoot3`（Spring Boot 3.x 兼容）、`isTenant`（多租户支持）、`opensource`（开源版，影响Excel插件import路径）
 
 ## 架构模式
 
