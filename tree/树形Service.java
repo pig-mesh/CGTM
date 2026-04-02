@@ -1,0 +1,31 @@
+package ${package}.${moduleName}.service;
+
+import cn.hutool.core.lang.tree.Tree;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.service.IService;
+import ${package}.${moduleName}.entity.${ClassName}Entity;
+
+import java.util.List;
+
+/**
+ * ${tableComment} Service接口
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+public interface ${ClassName}Service extends IService<${ClassName}Entity> {
+
+    /**
+     * 构建树形结构数据
+     * @param wrapper 查询条件
+     * @return 树形结构数据
+     */
+    List<Tree<${pk.attrType}>> buildTree(LambdaQueryWrapper<${ClassName}Entity> wrapper);
+
+    /**
+     * 递归删除节点及其子节点
+     * @param ids 要删除的节点ID列表
+     * @return 删除结果
+     */
+    boolean removeBatchByIds(List<${pk.attrType}> ids);
+} 

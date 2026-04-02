@@ -7,6 +7,7 @@ on:
       - next
       - dev
       - 202601
+      - tree
 
 jobs:
   sync-repo:
