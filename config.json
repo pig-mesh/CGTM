@@ -53,12 +53,12 @@
   ],
   "主子表增删改查": [
     {
-      "templateName": "Service",
+      "templateName": "主子Service",
       "generatorPath": "${backendPath}/src/main/java/${packagePath}/${moduleName}/service/${ClassName}Service.java",
       "templateFile": "multiple/主子Service.java"
     },
     {
-      "templateName": "ServiceImpl",
+      "templateName": "主子ServiceImpl",
       "generatorPath": "${backendPath}/src/main/java/${packagePath}/${moduleName}/service/impl/${ClassName}ServiceImpl.java",
       "templateFile": "multiple/主子ServiceImpl.java"
     },
@@ -93,7 +93,7 @@
       "templateFile": "multiple/子实体.java"
     },
     {
-      "templateName": "主子Contoller",
+      "templateName": "主子Controller",
       "generatorPath": "${backendPath}/src/main/java/${packagePath}/${moduleName}/controller/${ClassName}Controller.java",
       "templateFile": "multiple/主子Contoller.java"
     },
@@ -115,22 +115,22 @@
   ],
   "树形表格增删改查": [
     {
-      "templateName": "Controller",
+      "templateName": "树形Controller",
       "generatorPath": "${backendPath}/src/main/java/${packagePath}/${moduleName}/controller/${ClassName}Controller.java",
       "templateFile": "tree/树形Controller.java"
     },
     {
-      "templateName": "Service",
+      "templateName": "树形Service",
       "generatorPath": "${backendPath}/src/main/java/${packagePath}/${moduleName}/service/${ClassName}Service.java",
       "templateFile": "tree/树形Service.java"
     },
     {
-      "templateName": "ServiceImpl",
+      "templateName": "树形ServiceImpl",
       "generatorPath": "${backendPath}/src/main/java/${packagePath}/${moduleName}/service/impl/${ClassName}ServiceImpl.java",
       "templateFile": "tree/树形ServiceImpl.java"
     },
     {
-      "templateName": "实体",
+      "templateName": "树形实体",
       "generatorPath": "${backendPath}/src/main/java/${packagePath}/${moduleName}/entity/${ClassName}Entity.java",
       "templateFile": "tree/树形实体.java"
     },
@@ -150,7 +150,7 @@
       "templateFile": "common/权限菜单.sql"
     },
     {
-      "templateName": "api.ts",
+      "templateName": "树形api.ts",
       "generatorPath": "${frontendPath}/src/api/${moduleName}/${functionName}.ts",
       "templateFile": "tree/树形api.ts"
     },
