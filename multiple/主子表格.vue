@@ -102,7 +102,7 @@
             type="primary" 
             class="ml10" 
             @click="formDialogRef.openDialog()"
-            v-auth="'${moduleName}_${functionName}_add'">
+            v-auth="'$str.lowerCase($moduleName)_$str.lowerCase($functionName)_add'">
             新增
           </el-button>
           <el-button 
@@ -110,13 +110,13 @@
             :disabled="multiple" 
             icon="Delete" 
             type="primary"
-            v-auth="'${moduleName}_${functionName}_del'" 
+            v-auth="'$str.lowerCase($moduleName)_$str.lowerCase($functionName)_del'" 
             @click="handleDelete(selectObjs.value)">
             删除
           </el-button>
           <right-toolbar 
             v-model:showSearch="showSearch" 
-            :export="'${moduleName}_${functionName}_export'"
+            :export="'$str.lowerCase($moduleName)_$str.lowerCase($functionName)_export'"
             @exportExcel="exportExcel" 
             class="ml10 mr20" 
             style="float: right;"
@@ -165,7 +165,7 @@
               text 
               type="primary" 
               icon="view" 
-              v-auth="'${moduleName}_${functionName}_view'" 
+              v-auth="'$str.lowerCase($moduleName)_$str.lowerCase($functionName)_view'" 
               @click="formDialogRef.openDialog(scope.row.${pk.attrName}, true)">
               详情
             </el-button>
@@ -174,7 +174,7 @@
               icon="edit-pen" 
               text 
               type="primary" 
-              v-auth="'${moduleName}_${functionName}_edit'"
+              v-auth="'$str.lowerCase($moduleName)_$str.lowerCase($functionName)_edit'"
               @click="formDialogRef.openDialog(scope.row.${pk.attrName})">
               编辑
             </el-button>
@@ -182,7 +182,7 @@
               icon="delete" 
               text 
               type="primary" 
-              v-auth="'${moduleName}_${functionName}_del'" 
+              v-auth="'$str.lowerCase($moduleName)_$str.lowerCase($functionName)_del'" 
               @click="handleDelete([scope.row.${pk.attrName}])">
               删除
             </el-button>

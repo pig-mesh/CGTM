@@ -118,6 +118,24 @@
 
 该约定必须在实现中明确，否则实现者可能误把当前场景继续按“子表保存主表外键”处理。
 
+### 5.4 关键元信息来源表
+
+| 字段 | 来源 | 是否新增输入 | 本模板组中的含义 |
+| --- | --- | --- | --- |
+| `mainField` | 复用现有主子表配置 | 否 | 主表中的树节点外键字段 |
+| `childFieldList` | 复用现有主子表配置 | 否 | 左树子表字段列表 |
+| `ChildClassName` / `childClassName` | 复用现有主子表配置 | 否 | 左树子表实体命名 |
+| `childTableName` | 复用现有主子表配置 | 否 | 左树子表表名 |
+| `parentField` | 新增模板配置 | 是 | 左树子表父节点字段 |
+| `nameField` | 新增模板配置 | 是 | 左树节点显示名称字段 |
+| 左树子表主键 | 从 `childFieldList` 推导 | 否 | 通过 `primaryPk = true` 的字段识别 |
+
+结论：
+
+- 本模板组需要在生成器配置层新增两个最小输入：`parentField`、`nameField`
+- `mainField` 沿用现有主子表配置，但语义固定为“主表引用树节点的外键”
+- 不要求新增更复杂的上下文字段体系
+
 ## 6. 模板分组与生成产物
 
 新增模板组名称：
@@ -159,6 +177,39 @@
 - `api.ts`：同时暴露主表和树接口
 
 不建议将左右两种编辑能力继续合并到一个表单文件中，否则页面职责会过于拥挤。
+
+### 6.6 `config.json` 注册要求
+
+该仓库是 registry-driven，新增模板组后必须同步更新 `config.json`，否则模板无法出现在代码生成器里。
+
+建议新增一组根配置：
+
+- 分组名：`左树右表增删改查`
+
+建议的文件映射如下：
+
+| templateName | generatorPath | templateFile |
+| --- | --- | --- |
+| `Controller` | `${backendPath}/src/main/java/${packagePath}/${moduleName}/controller/${ClassName}Controller.java` | `treeTable/Controller.java` |
+| `Service` | `${backendPath}/src/main/java/${packagePath}/${moduleName}/service/${ClassName}Service.java` | `treeTable/Service.java` |
+| `ServiceImpl` | `${backendPath}/src/main/java/${packagePath}/${moduleName}/service/impl/${ClassName}ServiceImpl.java` | `treeTable/ServiceImpl.java` |
+| `实体` | `${backendPath}/src/main/java/${packagePath}/${moduleName}/entity/${ClassName}Entity.java` | `single/实体.java` |
+| `Mapper` | `${backendPath}/src/main/java/${packagePath}/${moduleName}/mapper/${ClassName}Mapper.java` | `single/Mapper.java` |
+| `Mapper.xml` | `${backendPath}/src/main/resources/mapper/${ClassName}Mapper.xml` | `single/Mapper.xml` |
+| `子实体` | `${backendPath}/src/main/java/${packagePath}/${moduleName}/entity/${ChildClassName}Entity.java` | `multiple/子实体.java` |
+| `子Mapper` | `${backendPath}/src/main/java/${packagePath}/${moduleName}/mapper/${ChildClassName}Mapper.java` | `multiple/子Mapper.java` |
+| `权限菜单` | `${backendPath}/menu/${functionName}_menu.sql` | `common/权限菜单.sql` |
+| `api.ts` | `${frontendPath}/src/api/${moduleName}/${functionName}.ts` | `treeTable/api.ts` |
+| `表格` | `${frontendPath}/src/views/${moduleName}/${functionName}/index.vue` | `treeTable/index.vue` |
+| `树表单` | `${frontendPath}/src/views/${moduleName}/${functionName}/tree-form.vue` | `treeTable/tree-form.vue` |
+| `主表单` | `${frontendPath}/src/views/${moduleName}/${functionName}/form.vue` | `treeTable/form.vue` |
+
+说明：
+
+- 新增模板目录建议命名为 `treeTable/`
+- 主表实体、Mapper、Mapper.xml 可以直接复用单表模板
+- 子实体、子 Mapper 可以直接复用主子表模板
+- 需要新建的主要是 `Controller / Service / ServiceImpl / api.ts / index.vue / tree-form.vue / form.vue`
 
 ## 7. 后端接口设计
 
@@ -252,6 +303,10 @@
 - 排除主表外键聚合概念中的无关字段
 - 保留 `parentField` 作为父级节点选择器
 - 使用 `nameField` 作为默认树节点显示名称来源
+- 根节点父级值统一使用 `0`，与现有树模板的根节点构建方式保持一致
+- 编辑节点时禁止选择自己作为父节点
+- 编辑节点时禁止选择自己的任意后代节点作为父节点，避免形成环
+- 父级节点选择列表需要排除当前节点及其后代
 
 ### 9.4 右表 CRUD
 

@@ -107,7 +107,7 @@
             type="primary" 
             class="ml10" 
             @click="formDialogRef.openDialog()"
-            v-auth="'${moduleName}_${functionName}_add'"
+            v-auth="'$str.lowerCase($moduleName)_$str.lowerCase($functionName)_add'"
           >
             新增
           </el-button>
@@ -117,7 +117,7 @@
             :disabled="multiple" 
             icon="Delete" 
             type="primary"
-            v-auth="'${moduleName}_${functionName}_del'" 
+            v-auth="'$str.lowerCase($moduleName)_$str.lowerCase($functionName)_del'" 
             @click="handleDelete(selectObjs)"
           >
             删除
@@ -187,7 +187,7 @@
               icon="plus" 
               text 
               type="primary" 
-              v-auth="'${moduleName}_${functionName}_add'"
+              v-auth="'$str.lowerCase($moduleName)_$str.lowerCase($functionName)_add'"
               @click="formDialogRef.openDialog(undefined, scope.row.${pk.attrName})"
             >
               新增
@@ -196,7 +196,7 @@
               icon="edit-pen" 
               text 
               type="primary" 
-              v-auth="'${moduleName}_${functionName}_edit'"
+              v-auth="'$str.lowerCase($moduleName)_$str.lowerCase($functionName)_edit'"
               @click="formDialogRef.openDialog(scope.row.${pk.attrName})"
             >
               编辑
@@ -205,7 +205,7 @@
               icon="delete" 
               text 
               type="primary" 
-              v-auth="'${moduleName}_${functionName}_del'" 
+              v-auth="'$str.lowerCase($moduleName)_$str.lowerCase($functionName)_del'" 
               @click="handleDelete([scope.row.${pk.attrName}])"
             >
               删除

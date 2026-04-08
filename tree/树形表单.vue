@@ -152,12 +152,12 @@ interface TreeNode {
   ${pk.attrName}: string | number | null;
 #foreach($field in $formList)
 #if($field.attrName != ${pk.attrName} && $field.attrName != ${parentField})
-#set($nameField = $field)
+#set($treeNameField = $field)
 #break
 #end
 #end
-#if($nameField)
-  ${nameField.attrName}: string;
+#if($treeNameField)
+  ${treeNameField.attrName}: string;
 #end
   children?: TreeNode[];
 }
@@ -310,7 +310,7 @@ const openDialog = async (id?: string, parentId?: string | number) => {
 
   // 初始化父级节点数据
   const { data } = await fetchTreeList();
-  parentNodes.value = [{ ${pk.attrName}: '0', ${nameField.attrName}: '根节点', children: data }];
+  parentNodes.value = [{ ${pk.attrName}: '0', ${treeNameField.attrName}: '根节点', children: data }];
 
   // 重置表单验证
   nextTick(() => {
