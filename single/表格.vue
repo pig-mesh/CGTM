@@ -161,12 +161,18 @@
             <dict-tag :options="$field.fieldDict" :value="scope.row.${field.attrName}" />
           </template>
         </el-table-column>
+#elseif(${field.formType} == 'upload-img')
+        <el-table-column prop="${field.attrName}" label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end">
+          <template #default="{ row }">
+            <upload-img disabled v-model:imageUrl="row.${field.attrName}"></upload-img>
+          </template>
+        </el-table-column>
 #else
-        <el-table-column 
-          prop="${field.attrName}" 
-          label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" 
+        <el-table-column
+          prop="${field.attrName}"
+          label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end"
 #if(${field.gridSort} == '1')
-          sortable="custom" 
+          sortable="custom"
 #end
           show-overflow-tooltip
         />
