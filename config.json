@@ -164,5 +164,72 @@
       "generatorPath": "${frontendPath}/src/views/${moduleName}/${functionName}/form.vue",
       "templateFile": "tree/树形表单.vue"
     }
+  ],
+  "左树右表增删改查": [
+    {
+      "templateName": "Controller",
+      "generatorPath": "${backendPath}/src/main/java/${packagePath}/${moduleName}/controller/${ClassName}Controller.java",
+      "templateFile": "treeTable/左树右表Controller.java"
+    },
+    {
+      "templateName": "Service",
+      "generatorPath": "${backendPath}/src/main/java/${packagePath}/${moduleName}/service/${ClassName}Service.java",
+      "templateFile": "treeTable/左树右表Service.java"
+    },
+    {
+      "templateName": "ServiceImpl",
+      "generatorPath": "${backendPath}/src/main/java/${packagePath}/${moduleName}/service/impl/${ClassName}ServiceImpl.java",
+      "templateFile": "treeTable/左树右表ServiceImpl.java"
+    },
+    {
+      "templateName": "实体",
+      "generatorPath": "${backendPath}/src/main/java/${packagePath}/${moduleName}/entity/${ClassName}Entity.java",
+      "templateFile": "single/实体.java"
+    },
+    {
+      "templateName": "Mapper",
+      "generatorPath": "${backendPath}/src/main/java/${packagePath}/${moduleName}/mapper/${ClassName}Mapper.java",
+      "templateFile": "single/Mapper.java"
+    },
+    {
+      "templateName": "Mapper.xml",
+      "generatorPath": "${backendPath}/src/main/resources/mapper/${ClassName}Mapper.xml",
+      "templateFile": "single/Mapper.xml"
+    },
+    {
+      "templateName": "子实体",
+      "generatorPath": "${backendPath}/src/main/java/${packagePath}/${moduleName}/entity/${ChildClassName}Entity.java",
+      "templateFile": "multiple/子实体.java"
+    },
+    {
+      "templateName": "子Mapper",
+      "generatorPath": "${backendPath}/src/main/java/${packagePath}/${moduleName}/mapper/${ChildClassName}Mapper.java",
+      "templateFile": "multiple/子Mapper.java"
+    },
+    {
+      "templateName": "权限菜单",
+      "generatorPath": "${backendPath}/menu/${functionName}_menu.sql",
+      "templateFile": "common/权限菜单.sql"
+    },
+    {
+      "templateName": "api.ts",
+      "generatorPath": "${frontendPath}/src/api/${moduleName}/${functionName}.ts",
+      "templateFile": "treeTable/左树右表api.ts"
+    },
+    {
+      "templateName": "表格",
+      "generatorPath": "${frontendPath}/src/views/${moduleName}/${functionName}/index.vue",
+      "templateFile": "treeTable/左树右表表格.vue"
+    },
+    {
+      "templateName": "树表单",
+      "generatorPath": "${frontendPath}/src/views/${moduleName}/${functionName}/tree-form.vue",
+      "templateFile": "treeTable/左树右表树表单.vue"
+    },
+    {
+      "templateName": "主表单",
+      "generatorPath": "${frontendPath}/src/views/${moduleName}/${functionName}/form.vue",
+      "templateFile": "treeTable/左树右表主表单.vue"
+    }
   ]
 }
