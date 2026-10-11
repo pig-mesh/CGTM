@@ -146,8 +146,8 @@ export function ${ClassName}Form({ initial, onClose, onSaved }: {
   const [children, setChildren] = useState(() => (initial.${childClassName}List || []).map((value) => ({ key: crypto.randomUUID(), value })))
 #end
   return (
-    <Dialog open onOpenChange={(open) => { if (!open && !operation.busy) onClose() }}>
-      <DialogContent className='max-h-[90svh] overflow-y-auto sm:max-w-4xl' onInteractOutside={(event) => event.preventDefault()}>
+    <Dialog disablePointerDismissal open onOpenChange={(open) => { if (!open && !operation.busy) onClose() }}>
+      <DialogContent className='max-h-[90svh] overflow-y-auto sm:max-w-4xl'>
         <DialogHeader>
           <DialogTitle>{initial.${pk.attrName} == null ? '新增' : '编辑'}${tableComment}</DialogTitle>
           <DialogDescription className='sr-only'>填写表单并保存</DialogDescription>
@@ -196,7 +196,7 @@ export function ${ClassName}Form({ initial, onClose, onSaved }: {
 #end
           <DialogFooter>
             <SystemActionButton action='close' type='button' variant='outline' disabled={operation.busy} onClick={onClose}>取消</SystemActionButton>
-            <SystemActionButton action='save' disabled={operation.busy}>保存</SystemActionButton>
+            <SystemActionButton action='save' type='submit' disabled={operation.busy}>保存</SystemActionButton>
           </DialogFooter>
         </ManagedForm>
       </DialogContent>

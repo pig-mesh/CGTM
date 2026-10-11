@@ -106,7 +106,7 @@ export default function ${ClassName}Page() {
           <Input className='w-48' aria-label='${field.fieldComment}' placeholder='${field.fieldComment}' value={search.${field.attrName} ?? ''} onChange={(event) => setSearch({ ...search, ${field.attrName}: event.target.value })} />
 #end
 #end
-          <SystemActionButton action='search' variant='outline'>查询</SystemActionButton>
+          <SystemActionButton action='search' type='submit' variant='outline'>查询</SystemActionButton>
           <SystemActionButton action='reset' type='button' variant='ghost' onClick={() => { setSearch({}); setFilters({}); setCurrent(1); setSelected([]); if (current === 1 && !Object.keys(filters).length) void refresh() }}>重置</SystemActionButton>
         </form>}
       />
