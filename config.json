@@ -1,5 +1,5 @@
 {
-  "单表增删改查": [
+  "React单表增删改查": [
     {
       "templateName": "Controller",
       "generatorPath": "${backendPath}/src/main/java/${packagePath}/${moduleName}/controller/${ClassName}Controller.java",
@@ -36,22 +36,22 @@
       "templateFile": "common/权限菜单.sql"
     },
     {
-      "templateName": "api.ts",
+      "templateName": "React api.ts",
       "generatorPath": "${frontendPath}/src/api/${moduleName}/${functionName}.ts",
-      "templateFile": "common/api.ts"
+      "templateFile": "react/api.ts"
     },
     {
-      "templateName": "表格",
-      "generatorPath": "${frontendPath}/src/views/${moduleName}/${functionName}/index.vue",
-      "templateFile": "single/表格.vue"
+      "templateName": "React 表格",
+      "generatorPath": "${frontendPath}/src/views/${moduleName}/${functionName}/index.tsx",
+      "templateFile": "react/index.tsx"
     },
     {
-      "templateName": "表单",
-      "generatorPath": "${frontendPath}/src/views/${moduleName}/${functionName}/form.vue",
-      "templateFile": "single/表单.vue"
+      "templateName": "React 表单",
+      "generatorPath": "${frontendPath}/src/views/${moduleName}/${functionName}/form.tsx",
+      "templateFile": "react/form.tsx"
     }
   ],
-  "主子表增删改查": [
+  "React主子表增删改查": [
     {
       "templateName": "Service",
       "generatorPath": "${backendPath}/src/main/java/${packagePath}/${moduleName}/service/${ClassName}Service.java",
@@ -83,9 +83,9 @@
       "templateFile": "common/权限菜单.sql"
     },
     {
-      "templateName": "api.ts",
+      "templateName": "React api.ts",
       "generatorPath": "${frontendPath}/src/api/${moduleName}/${functionName}.ts",
-      "templateFile": "common/api.ts"
+      "templateFile": "react/api.ts"
     },
     {
       "templateName": "子实体",
@@ -98,14 +98,14 @@
       "templateFile": "multiple/主子Contoller.java"
     },
     {
-      "templateName": "主子表单",
-      "generatorPath": "${frontendPath}/src/views/${moduleName}/${functionName}/form.vue",
-      "templateFile": "multiple/主子表单.vue"
+      "templateName": "React 表单",
+      "generatorPath": "${frontendPath}/src/views/${moduleName}/${functionName}/form.tsx",
+      "templateFile": "react/form.tsx"
     },
     {
-      "templateName": "主子表格",
-      "generatorPath": "${frontendPath}/src/views/${moduleName}/${functionName}/index.vue",
-      "templateFile": "multiple/主子表格.vue"
+      "templateName": "React 表格",
+      "generatorPath": "${frontendPath}/src/views/${moduleName}/${functionName}/index.tsx",
+      "templateFile": "react/index.tsx"
     },
     {
       "templateName": "子Mapper",

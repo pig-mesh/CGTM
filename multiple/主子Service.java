@@ -1,3 +1,8 @@
+#foreach($field in $childFieldList)
+#if($field.primaryPk == '1')
+#set($childPk = $field)
+#end
+#end
 package ${package}.${moduleName}.service;
 
 import com.github.yulichang.extension.mapping.base.MPJDeepService;
@@ -9,7 +14,7 @@ public interface ${ClassName}Service extends MPJDeepService<${ClassName}Entity> 
 
     Boolean updateDeep(${ClassName}Entity ${className});
 
-    Boolean removeDeep(Long[] ids);
+    Boolean removeDeep(${pk.attrType}[] ids);
 
-    Boolean removeChild(Long[] ids);
+    Boolean removeChild(${childPk.attrType}[] ids);
 }

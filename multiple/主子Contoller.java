@@ -1,3 +1,8 @@
+#foreach($field in $childFieldList)
+#if($field.primaryPk == '1')
+#set($childPk = $field)
+#end
+#end
 package ${package}.${moduleName}.controller;
 
 #if($queryList)
@@ -179,7 +184,7 @@ public class ${ClassName}Controller {
     #else
     @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_del')" )
     #end
-    public R removeChild(@RequestBody ${pk.attrType}[] ids) {
+    public R removeChild(@RequestBody ${childPk.attrType}[] ids) {
         return R.ok(${className}Service.removeChild(ids));
     }
 
