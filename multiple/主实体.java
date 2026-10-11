@@ -11,7 +11,7 @@ import ${package}.common.core.util.TenantTable;
 #foreach($import in $importList)
 import $import;
 #end
-import cn.idev.excel.annotation.ExcelIgnore;
+import org.apache.fesod.sheet.annotation.ExcelIgnore;
 import com.github.yulichang.annotation.EntityMapping;
 import java.util.List;
 
