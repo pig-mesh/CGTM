@@ -18,11 +18,19 @@
 #end
 #set($types = [])
 #set($needsInput = false)
+#set($hasDictControls = false)
 #set($needsSwitch = false)
 #set($hasDuplicate = false)
 #set($hasValidation = false)
 #foreach($field in $allFields)
 #set($void = $types.add($field.formType))
+#if($field.formType == 'select' || $field.formType == 'radio' || $field.formType == 'checkbox')
+#if($field.fieldDict)
+#set($hasDictControls = true)
+#else
+#set($needsInput = true)
+#end
+#end
 #if($field.attrType == 'Boolean')
 #set($needsSwitch = true)
 #elseif($field.formType != 'select' && $field.formType != 'radio' && $field.formType != 'checkbox' && $field.formType != 'textarea' && $field.formType != 'upload-img' && $field.formType != 'upload-file' && $field.formType != 'editor')
@@ -51,7 +59,7 @@ import { Switch } from '@/components/ui/switch'
 #if($types.contains('textarea'))
 import { Textarea } from '@/components/ui/textarea'
 #end
-#if($types.contains('select') || $types.contains('radio') || $types.contains('checkbox'))
+#if($hasDictControls)
 import { DictSelect } from '@/components/common/dict-select'
 #end
 #if($types.contains('upload-img'))
@@ -97,10 +105,12 @@ const patterns: Record<string, RegExp> = {
                 // 保留 ManagedField 的失焦与错误提示关联。
                 void onOpenChange
                 void controlProps
-#if($field.formType == 'checkbox')
+#if($field.formType == 'checkbox' && $field.fieldDict)
                 return <DictSelect multiple type='$!{field.fieldDict}' value={Array.isArray(value) ? value.map(String) : []} onChange={change} triggerProps={controlProps} onOpenChange={onOpenChange} label='${field.fieldComment}' />
-#elseif($field.formType == 'select' || $field.formType == 'radio')
+#elseif(($field.formType == 'select' || $field.formType == 'radio') && $field.fieldDict)
                 return <DictSelect type='$!{field.fieldDict}' value={String(value ?? '')} onChange={(next) => change(#if($field.attrType == 'Integer' || $field.attrType == 'Double')next === '' ? null : Number(next)#else next#end)} triggerProps={controlProps} onOpenChange={onOpenChange} label='${field.fieldComment}' #if($field.formType == 'radio')presentation='toggle'#end />
+#elseif($field.formType == 'checkbox')
+                return <Input {...controlProps} value={Array.isArray(value) ? value.join(',') : ''} placeholder='多个值用逗号分隔' onChange={(event) => change(event.target.value.split(',').filter(Boolean))} />
 #elseif($field.formType == 'textarea')
                 return <Textarea {...controlProps} value={String(value ?? '')} onChange={(event) => change(event.target.value)} />
 #elseif($field.formType == 'upload-img')
