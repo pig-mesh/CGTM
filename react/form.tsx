@@ -1,3 +1,5 @@
+#set($permissionPrefix = "${moduleName}_${functionName}")
+#set($permissionPrefix = $permissionPrefix.toLowerCase())
 #set($allFields = [])
 #set($hasMainFields = false)
 #foreach($field in $formList)
@@ -180,7 +182,7 @@ export function ${ClassName}Form({ initial, onClose, onSaved }: {
 #control($field 'child.value' 'updateChild' $fieldName)
 #end
 #end
-                {(child.value.${childPk.attrName} == null || permissions.includes('${moduleName}_${functionName}_del')) && <SystemActionButton action='delete' type='button' variant='outline' disabled={operation.busy} onClick={async () => {
+                {(child.value.${childPk.attrName} == null || permissions.includes('${permissionPrefix}_del')) && <SystemActionButton action='delete' type='button' variant='outline' disabled={operation.busy} onClick={async () => {
                   const id = child.value.${childPk.attrName}
                   if (id != null && !(await confirm('确认立即删除此明细？此操作不会随关闭表单撤销。'))) return
                   await operation.run(async () => {

@@ -1,3 +1,5 @@
+#set($permissionPrefix = "${moduleName}_${functionName}")
+#set($permissionPrefix = $permissionPrefix.toLowerCase())
 package ${package}.${moduleName}.controller;
 
 #if($queryList)
@@ -62,9 +64,9 @@ public class ${ClassName}Controller {
     @Operation(summary = "分页查询" , description = "分页查询" )
     @GetMapping("/page" )
     #if($isSpringBoot3)
-    @HasPermission("${moduleName}_${functionName}_view")
+    @HasPermission("${permissionPrefix}_view")
     #else
-    @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_view')" )
+    @PreAuthorize("@pms.hasPermission('${permissionPrefix}_view')" )
     #end
     public R get${ClassName}Page(@ParameterObject Page page, @ParameterObject ${ClassName}Entity ${className}) {
         LambdaQueryWrapper<${ClassName}Entity> wrapper = Wrappers.lambdaQuery();
@@ -108,9 +110,9 @@ public class ${ClassName}Controller {
     @Operation(summary = "通过条件查询" , description = "通过条件查询对象" )
     @GetMapping("/details" )
     #if($isSpringBoot3)
-    @HasPermission("${moduleName}_${functionName}_view")
+    @HasPermission("${permissionPrefix}_view")
     #else
-    @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_view')" )
+    @PreAuthorize("@pms.hasPermission('${permissionPrefix}_view')" )
     #end
     public R getDetails(@ParameterObject ${ClassName}Entity ${className}) {
         return R.ok(${className}Service.list(Wrappers.query(${className})));
@@ -125,9 +127,9 @@ public class ${ClassName}Controller {
     @SysLog("新增${tableComment}" )
     @PostMapping
     #if($isSpringBoot3)
-    @HasPermission("${moduleName}_${functionName}_add")
+    @HasPermission("${permissionPrefix}_add")
     #else
-    @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_add')" )
+    @PreAuthorize("@pms.hasPermission('${permissionPrefix}_add')" )
     #end
     public R save(@RequestBody ${ClassName}Entity ${className}) {
         return R.ok(${className}Service.save(${className}));
@@ -142,9 +144,9 @@ public class ${ClassName}Controller {
     @SysLog("修改${tableComment}" )
     @PutMapping
     #if($isSpringBoot3)
-    @HasPermission("${moduleName}_${functionName}_edit")
+    @HasPermission("${permissionPrefix}_edit")
     #else
-    @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_edit')" )
+    @PreAuthorize("@pms.hasPermission('${permissionPrefix}_edit')" )
     #end
     public R updateById(@RequestBody ${ClassName}Entity ${className}) {
         return R.ok(${className}Service.updateById(${className}));
@@ -159,9 +161,9 @@ public class ${ClassName}Controller {
     @SysLog("通过id删除${tableComment}" )
     @DeleteMapping
     #if($isSpringBoot3)
-    @HasPermission("${moduleName}_${functionName}_del")
+    @HasPermission("${permissionPrefix}_del")
     #else
-    @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_del')" )
+    @PreAuthorize("@pms.hasPermission('${permissionPrefix}_del')" )
     #end
     public R removeById(@RequestBody ${pk.attrType}[] ids) {
         return R.ok(${className}Service.removeBatchByIds(CollUtil.toList(ids)));
@@ -177,9 +179,9 @@ public class ${ClassName}Controller {
     @ResponseExcel
     @GetMapping("/export")
     #if($isSpringBoot3)
-    @HasPermission("${moduleName}_${functionName}_export")
+    @HasPermission("${permissionPrefix}_export")
     #else
-    @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_export')" )
+    @PreAuthorize("@pms.hasPermission('${permissionPrefix}_export')" )
     #end
     public List<${ClassName}Entity> exportExcel(${ClassName}Entity ${className},${pk.attrType}[] ids) {
         return ${className}Service.list(Wrappers.lambdaQuery(${className}).in(ArrayUtil.isNotEmpty(ids), ${ClassName}Entity::$str.getProperty($pk.attrName), ids));
@@ -193,9 +195,9 @@ public class ${ClassName}Controller {
      */
     @PostMapping("/import")
     #if($isSpringBoot3)
-    @HasPermission("${moduleName}_${functionName}_export")
+    @HasPermission("${permissionPrefix}_export")
     #else
-    @PreAuthorize("@pms.hasPermission('${moduleName}_${functionName}_export')" )
+    @PreAuthorize("@pms.hasPermission('${permissionPrefix}_export')" )
     #end
     public R importExcel(@RequestExcel List<${ClassName}Entity> ${className}List, BindingResult bindingResult) {
         return R.ok(${className}Service.saveBatch(${className}List));

@@ -1,3 +1,5 @@
+#set($permissionPrefix = "${moduleName}_${functionName}")
+#set($permissionPrefix = $permissionPrefix.toLowerCase())
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { fetchList, getObj, delObjs, type ${ClassName}Record } from '@/api/${moduleName}/${functionName}'
@@ -50,7 +52,7 @@ function DictionaryValue({ type, value }: { type: string; value: string | number
 #end
 export default function ${ClassName}Page() {
   const permissions = useSession((s) => s.user?.permissions || [])
-  const can = (action: string) => permissions.includes('${moduleName}_${functionName}_' + action)
+  const can = (action: string) => permissions.includes('${permissionPrefix}_' + action)
   const confirm = useConfirm()
   const operation = useOperation()
   const [current, setCurrent] = useState(1)
