@@ -184,7 +184,7 @@ export function ${ClassName}Form({ initial, onClose, onSaved }: {
 #end
                 {(child.value.${childPk.attrName} == null || permissions.includes('${permissionPrefix}_del')) && <SystemActionButton action='delete' type='button' variant='outline' disabled={operation.busy} onClick={async () => {
                   const id = child.value.${childPk.attrName}
-                  if (id != null && !(await confirm('确认立即删除此明细？此操作不会随关闭表单撤销。'))) return
+                  if (id != null && !(await confirm({ description: '确认立即删除此明细？此操作不会随关闭表单撤销。', destructive: true }))) return
                   await operation.run(async () => {
                     if (id != null) await delChildObj([id])
                     setChildren((rows) => rows.filter((row) => row.key !== child.key))

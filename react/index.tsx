@@ -71,7 +71,7 @@ export default function ${ClassName}Page() {
     await query.refetch()
   }
   async function remove(ids: string[]) {
-    if (!(await confirm('确认删除选中的记录？'))) return
+    if (!(await confirm({ description: '确认删除 ' + ids.length + ' 条${tableComment}记录？', destructive: true }))) return
     await operation.run(async () => {
       await delObjs(ids)
       setSelected([])
