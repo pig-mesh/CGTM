@@ -1,10 +1,10 @@
 ## React 分支使用
 
-本分支提供 `React单表增删改查` 和 `React主子表增删改查` 两组模板，目标前端为 `pigx-ui-shadcn`。Java、Mapper 和菜单 SQL 沿用原模板，前端输出 API、`index.tsx` 和 `form.tsx`。两组共享的 React 模板通过既有 `ChildClassName` / `childFieldList` 区分主子表，不增加生成器上下文变量。
+本分支提供 `React单表增删改查` 和 `React主子表增删改查` 两组模板，目标前端为 `pigx-ui-react`。Java、Mapper 和菜单 SQL 沿用原模板，前端输出 API、`index.tsx` 和 `form.tsx`。两组共享的 React 模板通过既有 `ChildClassName` / `childFieldList` 区分主子表，不增加生成器上下文变量。
 
 1. 将本分支发布到在线模板源的 `react` 分支后，将后端配置 `pigx.codegen.branch` 设为 `react`。默认值已同步修改；外部配置若指定其他分支，需对应调整。
 2. 在模板管理中加载新版本，选择对应的 React 模板组。版本号使用独立的 `V20261011-react-3`，避免复用已经入库的 Vue 模板。后续更新模板内容时须递增 `VERSION`。
-3. 生成时将前端目录设为 `pigx-ui-shadcn`。确认主键、表单项、列表项、查询项及字段字典；主子表还需设置主表关联字段、子表关联字段及子表自己的主键。
+3. 生成时将前端目录设为 `pigx-ui-react`。确认主键、表单项、列表项、查询项及字段字典；主子表还需设置主表关联字段、子表关联字段及子表自己的主键。
 4. 将生成页面注册到管理端的 `src/layout/router-view/workspace.tsx` 页面分发中。现有管理端不会自动扫描新页面：使用 `lazy(() => import('@/views/模块/功能/index'))`，在通用模块分发之前按菜单 `componentPath` 匹配，放入 `Suspense` 渲染。菜单路径仍为 `/模块/功能/index`。
 5. 审核生成的菜单 SQL 并设置实际父菜单、租户，再通过项目既有流程导入和授权。
 
