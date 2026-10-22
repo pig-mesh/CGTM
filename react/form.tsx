@@ -89,16 +89,15 @@ const patterns: Record<string, RegExp> = {
   url: /^(https?|ftp|file):\/\/\S+$/,
 }
 #end
-## 宏直接输出 JSX；不依赖磁盘 #parse，支持模板存入数据库后独立渲染。
 #macro(control $field $row $update $name)
-            <ManagedField<unknown> allowFalse name={$name} value={${row}.${field.attrName}} label='${field.fieldComment}' required={#if($field.formRequired == '1')true#else false#end}
+            <ManagedField<unknown> allowFalse name={$name} value={${row}.${field.attrName}} label='${field.fieldComment}'#if($field.formRequired == '1') required#end
 #if($field.formValidator == 'duplicate' && $row == 'form')
               rules={{ validate: async (value) => {
-                if (initial.${pk.attrName} != null || value == null || value === '') return true
+                if (initial.${pk.attrName} != null || !String(value ?? '').trim()) return true
                 return (await getObj({ ${field.attrName}: value })).length ? '数据已存在' : true
               } }}
 #elseif($field.formValidator && $field.formValidator != 'duplicate')
-              rules={{ validate: (value) => value == null || value === '' || patterns['${field.formValidator}']?.test(String(value)) || '字段格式不正确' }}
+              rules={{ validate: (value) => !String(value ?? '').trim() || patterns['${field.formValidator}']?.test(String(value)) || '字段格式不正确' }}
 #end
             >
               {({ onChange, onOpenChange, controlProps }) => {
