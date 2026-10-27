@@ -1,3 +1,34 @@
+## 查询条件按需导入：字符串字段和组织关键字用 StrUtil，其余类型用 Objects；复选框与日期范围两者都不用
+#set($needStrUtil = false)
+#set($needObjects = false)
+#foreach($field in $queryList)
+#if($field.formType == 'checkbox' || $field.queryFormType == 'daterange' || $field.queryFormType == 'datetimerange')
+#elseif($field.formType.startsWith('org-') || $field.attrType == 'String')
+#set($needStrUtil = true)
+#else
+#set($needObjects = true)
+#end
+#end
+#set($hasOrgQuery = false)
+#foreach($field in $queryList)
+#if($field.formType.startsWith('org-'))
+#set($hasOrgQuery = true)
+#end
+#end
+## 组织字段以 [{id,name}] JSON 存储，按 ${attrName}Keyword 对整列模糊查询，分页和导出共用
+#macro(orgKeywordParams)#foreach($field in $queryList)#if($field.formType.startsWith('org-')), @RequestParam(required = false) String ${field.attrName}Keyword#end#end#end
+#macro(orgKeywordDecl)#foreach($field in $queryList)#if($field.formType.startsWith('org-')), String ${field.attrName}Keyword#end#end#end
+#macro(orgKeywordArgs)#foreach($field in $queryList)#if($field.formType.startsWith('org-')), ${field.attrName}Keyword#end#end#end
+#macro(orgKeywordFilters)
+#if($hasOrgQuery)
+        // 组织字段对整列 JSON 做 LIKE：关键字为数字或 id/name 时会误命中，需精确匹配时改用数据库 JSON 函数
+#end
+#foreach($field in $queryList)
+#if($field.formType.startsWith('org-'))
+        wrapper.like(StrUtil.isNotBlank(${field.attrName}Keyword), ${ClassName}Entity::$str.getProperty($field.attrName), ${field.attrName}Keyword);
+#end
+#end
+#end
 #set($permissionPrefix = "${moduleName}_${functionName}")
 #set($permissionPrefix = $permissionPrefix.toLowerCase())
 #foreach($field in $childFieldList)
@@ -7,7 +38,7 @@
 #end
 package ${package}.${moduleName}.controller;
 
-#if($queryList)
+#if($needStrUtil)
 import cn.hutool.core.util.StrUtil;
 #end
 import cn.hutool.core.util.ArrayUtil;
@@ -23,8 +54,7 @@ import com.pig4cloud.plugin.excel.annotation.RequestExcel;
 import ${package}.common.excel.annotation.ResponseExcel;
 import ${package}.common.excel.annotation.RequestExcel;
 #end
-import ${package}.${moduleName}.entity.${ClassName}Entity;
-import ${package}.${moduleName}.entity.${ChildClassName}Entity;
+import ${entityClassName};
 import ${package}.${moduleName}.service.${ClassName}Service;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 #if($isSpringBoot3)
@@ -42,7 +72,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+#if($needObjects)
 import java.util.Objects;
+#end
 
 /**
  * ${tableComment}
@@ -72,9 +104,18 @@ public class ${ClassName}Controller {
     #else
     @PreAuthorize("@pms.hasPermission('${permissionPrefix}_view')" )
     #end
-    public R get${ClassName}Page(@ParameterObject Page page, @ParameterObject ${ClassName}Entity ${className}) {
+    public R get${ClassName}Page(@ParameterObject Page page, @ParameterObject ${ClassName}Entity ${className}#orgKeywordParams()) {
+        return R.ok(${className}Service.page(page, buildQueryWrapper(${className}#orgKeywordArgs())));
+    }
+
+    /**
+     * 列表与导出共用的查询条件，保证导出结果与列表一致
+     */
+    private LambdaQueryWrapper<${ClassName}Entity> buildQueryWrapper(${ClassName}Entity ${className}#orgKeywordDecl()) {
         LambdaQueryWrapper<${ClassName}Entity> wrapper = Wrappers.lambdaQuery();
+#orgKeywordFilters()
 #foreach ($field in $queryList)
+#if(!$field.formType.startsWith('org-'))
 #set($getAttrName=$str.getProperty($field.attrName))
 #set($var="${className}.$getAttrName()")
 #if($field.attrType == 'String')
@@ -82,7 +123,18 @@ public class ${ClassName}Controller {
 #else
 #set($expression="Objects.nonNull")
 #end
-#if($field.queryType == '=')
+#if($field.formType == 'checkbox')
+		if (ArrayUtil.isNotEmpty($var)) {
+			// 复选框按逗号分隔存储，选中的每个值都需包含；取值互为子串时会误命中
+			for (${field.attrType} item : $var) {
+				wrapper.like(${ClassName}Entity::$getAttrName, item);
+			}
+		}
+#elseif($field.queryFormType == 'daterange' || $field.queryFormType == 'datetimerange')
+		if (ArrayUtil.isNotEmpty(${className}.${getAttrName}Range())) {
+            wrapper.between(${ClassName}Entity::$getAttrName, ${className}.${getAttrName}Range()[0], ${className}.${getAttrName}Range()[1]);
+        }
+#elseif($field.queryType == '=')
 		wrapper.eq($expression($var),${ClassName}Entity::$getAttrName,$var);
 #elseif( $field.queryType == 'like' )
 		wrapper.like($expression($var),${ClassName}Entity::$getAttrName,$var);
@@ -102,7 +154,8 @@ public class ${ClassName}Controller {
 		wrapper.likeRight($expression($var),${ClassName}Entity::$getAttrName,$var);
 #end
 #end
-        return R.ok(${className}Service.page(page, wrapper));
+#end
+        return wrapper;
     }
 
 
@@ -203,8 +256,8 @@ public class ${ClassName}Controller {
     #else
     @PreAuthorize("@pms.hasPermission('${permissionPrefix}_export')" )
     #end
-    public List<${ClassName}Entity> exportExcel(${ClassName}Entity ${className},${pk.attrType}[] ids) {
-        return ${className}Service.list(Wrappers.lambdaQuery(${className}).in(ArrayUtil.isNotEmpty(ids), ${ClassName}Entity::$str.getProperty($pk.attrName), ids));
+    public List<${ClassName}Entity> exportExcel(${ClassName}Entity ${className},${pk.attrType}[] ids#orgKeywordParams()) {
+        return ${className}Service.list(buildQueryWrapper(${className}#orgKeywordArgs()).in(ArrayUtil.isNotEmpty(ids), ${ClassName}Entity::$str.getProperty($pk.attrName), ids));
     }
 
     /**

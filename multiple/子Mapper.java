@@ -1,7 +1,7 @@
 package ${package}.${moduleName}.mapper;
 
 import ${package}.common.data.datascope.PigxBaseMapper;
-import ${package}.${moduleName}.entity.${ChildClassName}Entity;
+import ${entityPackage}.${ChildClassName}Entity;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper

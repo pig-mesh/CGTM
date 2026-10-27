@@ -3,12 +3,12 @@
 
 <mapper namespace="${package}.${moduleName}.mapper.${ClassName}Mapper">
 
-  <resultMap id="${className}Map" type="${package}.${moduleName}.entity.${ClassName}Entity">
+  <resultMap id="${className}Map" type="${entityClassName}">
 #foreach ($field in $fieldList)
 	    #if($field.primaryPk == '1')
         <id property="$field.attrName" column="$field.fieldName"/>
       #else
-        <result property="$field.attrName" column="$field.fieldName"/>
+        <result property="$field.attrName" column="$field.fieldName"#if($field.formType.startsWith('org-')) typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"#end/>
       #end
 #end
   </resultMap>

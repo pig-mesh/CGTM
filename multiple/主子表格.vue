@@ -1,3 +1,30 @@
+## 有字典字段时才导入 useDict
+#set($hasDictField = false)
+#foreach($field in $queryList)
+#if($field.fieldDict)
+#set($hasDictField = true)
+#end
+#end
+#foreach($field in $gridList)
+#if($field.fieldDict)
+#set($hasDictField = true)
+#end
+#end
+## 开关：按属性类型决定开/关的值，Boolean 用 true/false，整型用 1/0，其余用 '1'/'0'
+#macro(switchValues $f)
+#if($f.attrType == 'Boolean')
+#set($switchOn = 'true')
+#set($switchOff = 'false')
+#elseif($f.attrType == 'Integer' || $f.attrType == 'Long' || $f.attrType == 'Short')
+#set($switchOn = '1')
+#set($switchOff = '0')
+#else
+#set($switchOn = "'1'")
+#set($switchOff = "'0'")
+#end
+#end
+#set($permissionPrefix = "${moduleName}_${functionName}")
+#set($permissionPrefix = $permissionPrefix.toLowerCase())
 <template>
   <div class="layout-padding">
     <div class="layout-padding-auto layout-padding-view">
@@ -5,6 +32,7 @@
       <el-row v-show="showSearch">
         <el-form :model="state.queryForm" ref="queryRef" :inline="true" @keyup.enter="getDataList">
 #foreach($field in $queryList)
+#if($field.formType.startsWith('org-'))#set($queryKey = "${field.attrName}Keyword")#else#set($queryKey = $field.attrName)#end
 #if($field.queryFormType == 'select')
           <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
             <el-select v-model="state.queryForm.${field.attrName}" placeholder="请选择#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end">
@@ -22,21 +50,43 @@
           </el-form-item>
 #elseif($field.queryFormType == 'date')
           <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
-            <el-date-picker 
-              type="date" 
-              placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" 
+            <el-date-picker
+              type="date"
+              placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end"
               :value-format="dateStr"
-              v-model="state.queryForm.${field.attrName}">
-            </el-date-picker>
+              v-model="state.queryForm.${field.attrName}"
+            />
+          </el-form-item>
+#elseif($field.queryFormType == 'daterange')
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}Range">
+            <el-date-picker
+              type="daterange"
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+              v-model="state.queryForm.${field.attrName}Range"
+              :value-format="dateStr"
+            />
           </el-form-item>
 #elseif($field.queryFormType == 'datetime')
           <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
-            <el-date-picker 
-              type="datetime" 
-              placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" 
+            <el-date-picker
+              type="datetime"
+              placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end"
               :value-format="dateTimeStr"
-              v-model="state.queryForm.${field.attrName}">
-            </el-date-picker>
+              v-model="state.queryForm.${field.attrName}"
+            />
+          </el-form-item>
+#elseif($field.queryFormType == 'datetimerange')
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}Range">
+            <el-date-picker
+              type="datetimerange"
+              range-separator="至"
+              start-placeholder="开始时间"
+              end-placeholder="结束时间"
+              v-model="state.queryForm.${field.attrName}Range"
+              :value-format="dateTimeStr"
+            />
           </el-form-item>
 #elseif($field.formType == 'radio')
           <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
@@ -55,10 +105,10 @@
             </el-radio-group>
           </el-form-item>
 #else
-          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${queryKey}">
             <el-input 
               placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" 
-              v-model="state.queryForm.${field.attrName}"
+              v-model="state.queryForm.${queryKey}"
               style="max-width: 180px" 
             />
           </el-form-item>
@@ -80,7 +130,7 @@
             type="primary" 
             class="ml10" 
             @click="formDialogRef.openDialog()"
-            v-auth="'${moduleName}_${functionName}_add'">
+            v-auth="'${permissionPrefix}_add'">
             新增
           </el-button>
           <el-button 
@@ -88,13 +138,13 @@
             :disabled="multiple" 
             icon="Delete" 
             type="primary"
-            v-auth="'${moduleName}_${functionName}_del'" 
+            v-auth="'${permissionPrefix}_del'"
             @click="handleDelete(selectObjs.value)">
             删除
           </el-button>
           <right-toolbar 
             v-model:showSearch="showSearch" 
-            :export="'${moduleName}_${functionName}_export'"
+            :export="'${permissionPrefix}_export'"
             @exportExcel="exportExcel" 
             class="ml10 mr20" 
             style="float: right;"
@@ -113,18 +163,33 @@
         <el-table-column type="selection" width="40" align="center" />
         <el-table-column type="index" label="#" width="40" />
 #foreach($field in $gridList)
-#if($field.fieldDict)
+#if($field.formType.startsWith('org-'))
+        <el-table-column prop="${field.attrName}" label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" show-overflow-tooltip>
+          <template #default="scope">{{ scope.row.${field.attrName}?.map((item: { name: string }) => item.name).join('、') }}</template>
+        </el-table-column>
+#elseif($field.fieldDict)
         <el-table-column prop="${field.attrName}" label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" show-overflow-tooltip>
           <template #default="scope">
             <dict-tag :options="$field.fieldDict" :value="scope.row.${field.attrName}"></dict-tag>
           </template>
         </el-table-column>
+#elseif($field.formType == 'switch')
+#switchValues($field)
+        <el-table-column prop="${field.attrName}" label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" show-overflow-tooltip>
+          <template #default="scope">{{ String(scope.row.${field.attrName}) === String($switchOn) ? '是' : '否' }}</template>
+        </el-table-column>
+#elseif(${field.formType} == 'upload-img')
+        <el-table-column prop="${field.attrName}" label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end">
+          <template #default="{ row }">
+            <upload-img disabled v-model:imageUrl="row.${field.attrName}"></upload-img>
+          </template>
+        </el-table-column>
 #else
-        <el-table-column 
-          prop="${field.attrName}" 
-          label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" 
+        <el-table-column
+          prop="${field.attrName}"
+          label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end"
 #if(${field.gridSort} == '1')
-          sortable="custom" 
+          sortable="custom"
 #end
           show-overflow-tooltip
         />
@@ -137,7 +202,7 @@
               text 
               type="primary" 
               icon="view" 
-              v-auth="'${moduleName}_${functionName}_view'" 
+              v-auth="'${permissionPrefix}_view'"
               @click="formDialogRef.openDialog(scope.row.${pk.attrName}, true)">
               详情
             </el-button>
@@ -146,7 +211,7 @@
               icon="edit-pen" 
               text 
               type="primary" 
-              v-auth="'${moduleName}_${functionName}_edit'"
+              v-auth="'${permissionPrefix}_edit'"
               @click="formDialogRef.openDialog(scope.row.${pk.attrName})">
               编辑
             </el-button>
@@ -154,7 +219,7 @@
               icon="delete" 
               text 
               type="primary" 
-              v-auth="'${moduleName}_${functionName}_del'" 
+              v-auth="'${permissionPrefix}_del'"
               @click="handleDelete([scope.row.${pk.attrName}])">
               删除
             </el-button>
@@ -177,7 +242,9 @@
 import { BasicTableProps, useTable } from "/@/hooks/table";
 import { fetchList, delObjs } from "/@/api/${moduleName}/${functionName}";
 import { useMessage, useMessageBox } from "/@/hooks/message";
+#if($hasDictField)
 import { useDict } from '/@/hooks/dict';
+#end
 
 // 引入组件
 const FormDialog = defineAsyncComponent(() => import('./form.vue'));
@@ -201,7 +268,9 @@ const { $dict.format($fieldDict) } = useDict($dict.quotation($fieldDict));
 // 定义变量内容
 const formDialogRef = ref();
 // 搜索变量
+#if($queryList)
 const queryRef = ref();
+#end
 const showSearch = ref(true);
 // 多选变量
 const selectObjs = ref([]) as any;
@@ -222,6 +291,7 @@ const {
   tableStyle
 } = useTable(state);
 
+#if($queryList)
 // 清空搜索条件
 const resetQuery = () => {
   // 清空搜索条件
@@ -230,6 +300,7 @@ const resetQuery = () => {
   selectObjs.value = [];
   getDataList();
 };
+#end
 
 // 导出excel
 const exportExcel = () => {

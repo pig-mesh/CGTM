@@ -1,3 +1,9 @@
+## 组织字段支持（Vue / React）
+
+组织字段支持用户、部门、角色、岗位，表单可选多选或单选。字段单列存 `[{"id":"1","name":"张三"}]`（`List<OrgRef>` + `JacksonTypeHandler`），列表直接显示名称，查询按名称模糊匹配，不参与 Excel 导入导出。
+
+配置值、组件用法、接口及后续调整约定见 [组织选择与名称展示约定](docs/org-selection.md)。`config.json` 同时提供 Vue / React 单表、主子表模板组。
+
 ## React 分支使用
 
 本分支提供 `React单表增删改查` 和 `React主子表增删改查` 两组模板，目标前端为 `pigx-ui-react`。Java、Mapper 和菜单 SQL 沿用原模板，前端输出 API、`index.tsx` 和 `form.tsx`。两组共享的 React 模板通过既有 `ChildClassName` / `childFieldList` 区分主子表，不增加生成器上下文变量。
@@ -119,3 +125,50 @@ public class ${ClassName}Entity extends Model<${ClassName}Entity> {
 | ------------- | ------------------ |
 | isSpringBoot3 | 是否是 springboot3 |
 | isTenant      | 是否支持多租户     |
+
+## 左树右表模板约定
+
+新增模板组：`左树右表增删改查`
+
+该模板组用于生成“左侧树节点 + 右侧主表”的标准 CRUD 页面，关系方向为：
+
+- 左侧树使用子表元信息
+- 右侧列表和表单使用主表元信息
+- 左树内部层级关系使用 `parentField`
+- 主表通过 `childField` 指向左树节点主键
+
+### 变量来源
+
+右侧主表继续使用现有主表变量：
+
+- `fieldList`
+- `formList`
+- `gridList`
+- `queryList`
+- `pk`
+- `ClassName`
+- `className`
+
+左侧树继续复用主子表变量：
+
+- `childFieldList`
+- `childTableName`
+- `ChildClassName`
+- `childClassName`
+
+### 新增约定
+
+左树子表还需要额外提供两个字段约定：
+
+- `parentField`：树节点父级字段
+- `nameField`：树节点显示名称字段
+
+主表与左树关联继续复用现有变量：
+
+- `childField`：主表中关联左树节点的外键字段
+
+### 页面行为
+
+- 页面初始化时，左树加载全部节点，右表默认展示全部数据
+- 选中左树节点后，右表按 `childField` 过滤
+- 删除左树节点时，只允许删除没有子节点且没有关联主表数据的空节点

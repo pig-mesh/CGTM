@@ -1,9 +1,12 @@
 import { api } from '@/lib/common/api'
 import type { Id } from '@/lib/common/types'
+import type { OrgRef } from '@/components/common/org'
 
 export interface ${ClassName}Record {
 #foreach($field in $fieldList)
-#if($field.formType == 'checkbox')
+#if($field.formType.startsWith('org-'))
+  ${field.attrName}?: OrgRef[] | null
+#elseif($field.formType == 'checkbox')
   ${field.attrName}?: (string | number)[]
 #elseif($field.attrType == 'Boolean')
   ${field.attrName}?: boolean
@@ -20,7 +23,9 @@ export interface ${ClassName}Record {
 #if($ChildClassName)
 export interface ${ChildClassName}Record {
 #foreach($field in $childFieldList)
-#if($field.formType == 'checkbox')
+#if($field.formType.startsWith('org-'))
+  ${field.attrName}?: OrgRef[] | null
+#elseif($field.formType == 'checkbox')
   ${field.attrName}?: (string | number)[]
 #elseif($field.attrType == 'Boolean')
   ${field.attrName}?: boolean

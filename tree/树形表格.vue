@@ -1,0 +1,399 @@
+## 有字典字段时才导入 useDict
+#set($hasDictField = false)
+#foreach($field in $queryList)
+#if($field.fieldDict)
+#set($hasDictField = true)
+#end
+#end
+#foreach($field in $gridList)
+#if($field.fieldDict)
+#set($hasDictField = true)
+#end
+#end
+## 开关：按属性类型决定开/关的值，Boolean 用 true/false，整型用 1/0，其余用 '1'/'0'
+#macro(switchValues $f)
+#if($f.attrType == 'Boolean')
+#set($switchOn = 'true')
+#set($switchOff = 'false')
+#elseif($f.attrType == 'Integer' || $f.attrType == 'Long' || $f.attrType == 'Short')
+#set($switchOn = '1')
+#set($switchOff = '0')
+#else
+#set($switchOn = "'1'")
+#set($switchOff = "'0'")
+#end
+#end
+<template>
+  <div class="layout-padding">
+    <div class="layout-padding-auto layout-padding-view">
+#if($queryList)
+      <!-- 查询表单区域 -->
+      <el-row v-show="showSearch">
+        <el-form :model="state.queryForm" ref="queryRef" :inline="true" @keyup.enter="getDataList">
+#foreach($field in $queryList)
+#if($field.formType.startsWith('org-'))#set($queryKey = "${field.attrName}Keyword")#else#set($queryKey = $field.attrName)#end
+#if($field.queryFormType == 'select')
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${queryKey}">
+            <el-select v-model="state.queryForm.${queryKey}" placeholder="请选择#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end">
+#if($field.fieldDict)
+              <el-option 
+                :label="item.label" 
+                :value="item.value" 
+                v-for="(item, index) in ${field.fieldDict}" 
+                :key="index"
+              />
+#else
+              <el-option label="请选择" value="0" />
+#end
+            </el-select>
+          </el-form-item>
+#elseif($field.queryFormType == 'date')
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${queryKey}">
+            <el-date-picker 
+              type="date" 
+              placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" 
+              v-model="state.queryForm.${queryKey}"
+              :value-format="dateStr"
+            />
+          </el-form-item>
+#elseif($field.queryFormType == 'datetime')
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${queryKey}">
+            <el-date-picker
+              type="datetime"
+              placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end"
+              v-model="state.queryForm.${queryKey}"
+              :value-format="dateTimeStr"
+            />
+          </el-form-item>
+#elseif($field.queryFormType == 'daterange')
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}Range">
+            <el-date-picker
+              type="daterange"
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+              v-model="state.queryForm.${field.attrName}Range"
+              :value-format="dateStr"
+            />
+          </el-form-item>
+#elseif($field.queryFormType == 'datetimerange')
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}Range">
+            <el-date-picker
+              type="datetimerange"
+              range-separator="至"
+              start-placeholder="开始时间"
+              end-placeholder="结束时间"
+              v-model="state.queryForm.${field.attrName}Range"
+              :value-format="dateTimeStr"
+            />
+          </el-form-item>
+#elseif($field.formType == 'radio')
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${queryKey}">
+            <el-radio-group v-model="state.queryForm.${queryKey}">
+#if($field.fieldDict)
+              <el-radio 
+                :label="item.value" 
+                v-for="(item, index) in ${field.fieldDict}" 
+                border 
+                :key="index"
+              >
+                {{ item.label }}
+              </el-radio>
+#else
+              <el-radio label="${field.fieldComment}" border>
+                ${field.fieldComment}
+              </el-radio>
+#end
+            </el-radio-group>
+          </el-form-item>
+#else
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${queryKey}">
+            <el-input 
+              placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" 
+              v-model="state.queryForm.${queryKey}"
+            />
+          </el-form-item>
+#end
+#end
+          <el-form-item>
+            <el-button icon="search" type="primary" @click="getDataList">
+              查询
+            </el-button>
+            <el-button icon="Refresh" @click="resetQuery">重置</el-button>
+          </el-form-item>
+        </el-form>
+      </el-row>
+#end
+
+      <!-- 操作按钮区域 -->
+      <el-row>
+        <div class="mb8" style="width: 100%">
+          <el-button 
+            icon="folder-add" 
+            type="primary" 
+            class="ml10" 
+            @click="formDialogRef.openDialog()"
+            v-auth="'$str.lowerCase($moduleName)_$str.lowerCase($functionName)_add'"
+          >
+            新增
+          </el-button>
+
+          <el-button 
+            plain 
+            :disabled="multiple" 
+            icon="Delete" 
+            type="primary"
+            v-auth="'$str.lowerCase($moduleName)_$str.lowerCase($functionName)_del'" 
+            @click="handleDelete(selectObjs)"
+          >
+            删除
+          </el-button>
+
+          <el-button 
+            plain 
+            :icon="isExpand ? 'FolderOpened' : 'Folder'" 
+            type="primary"
+            @click="handleExpand"
+          >
+            {{ isExpand ? '全部折叠' : '全部展开' }}
+          </el-button>
+
+          <right-toolbar 
+            v-model:showSearch="showSearch" 
+            class="ml10 mr20" 
+            style="float: right;"
+            @queryTable="getDataList"
+          />
+        </div>
+      </el-row>
+
+      <!-- 树形数据表格区域 -->
+      <el-table 
+        ref="tableRef"
+        :data="state.dataList" 
+        v-loading="state.loading" 
+        border 
+        row-key="${pk.attrName}"
+        default-expand-all
+        :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
+        :cell-style="tableStyle.cellStyle" 
+        :header-cell-style="tableStyle.headerCellStyle"
+        @selection-change="selectionChangHandle"
+      >
+        <el-table-column type="selection" width="40" align="center" />
+        <el-table-column type="index" label="#" width="40" />
+#foreach($field in $gridList)
+#if($field.formType.startsWith('org-'))
+        <el-table-column prop="${field.attrName}" label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" show-overflow-tooltip>
+          <template #default="scope">{{ scope.row.${field.attrName}?.map((item: { name: string }) => item.name).join('、') }}</template>
+        </el-table-column>
+#elseif($field.fieldDict)
+        <el-table-column prop="${field.attrName}" label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" show-overflow-tooltip>
+          <template #default="scope">
+            <dict-tag :options="${field.fieldDict}" :value="scope.row.${field.attrName}" />
+          </template>
+        </el-table-column>
+#elseif($field.formType == 'switch')
+#switchValues($field)
+        <el-table-column prop="${field.attrName}" label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" show-overflow-tooltip>
+          <template #default="scope">{{ String(scope.row.${field.attrName}) === String($switchOn) ? '是' : '否' }}</template>
+        </el-table-column>
+#elseif(${field.formType} == 'upload-img')
+        <el-table-column prop="${field.attrName}" label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end">
+          <template #default="{ row }">
+            <upload-img disabled v-model:imageUrl="row.${field.attrName}"></upload-img>
+          </template>
+        </el-table-column>
+#else
+        <el-table-column
+          prop="${field.attrName}"
+          label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end"
+          show-overflow-tooltip
+#if($field == $gridList[0])
+          width="200"
+#end
+        />
+#end
+#end
+        <el-table-column label="操作" width="200" fixed="right">
+          <template #default="scope">
+            <el-button 
+              icon="plus" 
+              text 
+              type="primary" 
+              v-auth="'$str.lowerCase($moduleName)_$str.lowerCase($functionName)_add'"
+              @click="formDialogRef.openDialog(undefined, scope.row.${pk.attrName})"
+            >
+              新增
+            </el-button>
+            <el-button 
+              icon="edit-pen" 
+              text 
+              type="primary" 
+              v-auth="'$str.lowerCase($moduleName)_$str.lowerCase($functionName)_edit'"
+              @click="formDialogRef.openDialog(scope.row.${pk.attrName})"
+            >
+              编辑
+            </el-button>
+            <el-button 
+              icon="delete" 
+              text 
+              type="primary" 
+              v-auth="'$str.lowerCase($moduleName)_$str.lowerCase($functionName)_del'" 
+              @click="handleDelete([scope.row.${pk.attrName}])"
+            >
+              删除
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+
+    <!-- 编辑、新增弹窗 -->
+    <form-dialog ref="formDialogRef" @refresh="getDataList(false)" />
+  </div>
+</template>
+
+<script setup lang="ts" name="system${ClassName}Tree">
+// ========== 导入声明 ==========
+import { BasicTableProps, useTable } from "/@/hooks/table";
+import { fetchTreeList, delObjs } from "/@/api/${moduleName}/${functionName}";
+import { useMessage, useMessageBox } from "/@/hooks/message";
+#if($hasDictField)
+import { useDict } from '/@/hooks/dict';
+#end
+
+// ========== 组件声明 ==========
+// 异步加载表单弹窗组件
+const FormDialog = defineAsyncComponent(() => import('./form.vue'));
+
+// ========== 字典数据 ==========
+#set($fieldDict=[])
+#foreach($field in $queryList)
+#if($field.fieldDict)
+#set($void=$fieldDict.add($field.fieldDict))
+#end
+#end
+#foreach($field in $gridList)
+#if($field.fieldDict)
+#set($void=$fieldDict.add($field.fieldDict))
+#end
+#end
+#if($fieldDict && $fieldDict.size() > 0)
+// 加载字典数据
+const { $dict.format($fieldDict) } = useDict($dict.quotation($fieldDict));
+#end
+
+// ========== 组件引用 ==========
+const formDialogRef = ref();          // 表单弹窗引用
+#if($queryList)
+const queryRef = ref();               // 查询表单引用
+#end
+const tableRef = ref();               // 表格引用
+
+// ========== 响应式数据 ==========
+const showSearch = ref(true);         // 是否显示搜索区域
+const selectObjs = ref([]) as any;    // 表格多选数据
+const multiple = ref(true);           // 是否多选
+const isExpand = ref(true);           // 是否展开状态，默认展开
+
+// ========== 表格状态 ==========
+const state: BasicTableProps = reactive<BasicTableProps>({
+  isPage: false,  // 是否分页
+  queryForm: {},      // 查询参数
+  pageList: fetchTreeList, // 树形数据查询方法（不分页）
+  loading: false,     // 加载状态
+  dataList: []        // 数据列表
+});
+
+// ========== Hook引用 ==========
+// 表格相关Hook (树形表格不使用分页)
+const {
+  getDataList,
+  tableStyle
+} = useTable(state);
+
+// ========== 方法定义 ==========
+#if($queryList)
+/**
+ * 重置查询条件
+ */
+const resetQuery = () => {
+  // 清空搜索条件
+  queryRef.value?.resetFields();
+  // 清空多选
+  selectObjs.value = [];
+  // 重新查询
+  getDataList();
+};
+#end
+
+/**
+ * 表格多选事件处理
+ * @param objs 选中的数据行
+ */
+const selectionChangHandle = (objs: { ${pk.attrName}: string }[]) => {
+  selectObjs.value = objs.map(({ ${pk.attrName} }) => ${pk.attrName});
+  multiple.value = !objs.length;
+};
+
+/**
+ * 删除数据处理
+ * @param ids 要删除的数据ID数组
+ */
+const handleDelete = async (ids: string[]) => {
+  try {
+    await useMessageBox().confirm('此操作将永久删除选中数据及其子数据，是否继续?');
+  } catch {
+    return;
+  }
+
+  try {
+    await delObjs(ids);
+    getDataList();
+    useMessage().success('删除成功');
+  } catch (err: any) {
+    useMessage().error(err.msg);
+  }
+};
+
+/**
+ * 展开/折叠树形表格
+ * 基于Element Plus官方文档的toggleRowExpansion方法实现
+ */
+const handleExpand = () => {
+  isExpand.value = !isExpand.value;
+  
+  // 等待DOM更新后再进行展开/折叠操作
+  nextTick(() => {
+    if (state.dataList && state.dataList.length > 0 && tableRef.value) {
+      toggleExpand(state.dataList, isExpand.value);
+    }
+  });
+};
+
+/**
+ * 递归展开/折叠所有节点
+ * 使用Element Plus Table组件的toggleRowExpansion方法
+ * @param children 子节点数组
+ * @param unfold 是否展开
+ */
+const toggleExpand = (children: any[], unfold = true) => {
+  for (const item of children) {
+    // 使用Element Plus官方的toggleRowExpansion方法
+    // 第二个参数为可选的布尔值，直接设置展开状态
+    tableRef.value?.toggleRowExpansion(item, unfold);
+    
+    // 递归处理子节点
+    if (item.children && item.children.length > 0) {
+      toggleExpand(item.children, unfold);
+    }
+  }
+};
+
+// ========== 生命周期 ==========
+// 组件挂载时获取数据
+onMounted(() => {
+  getDataList();
+});
+</script>

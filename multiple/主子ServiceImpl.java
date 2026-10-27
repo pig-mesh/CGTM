@@ -6,13 +6,13 @@
 package ${package}.${moduleName}.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import ${package}.${moduleName}.entity.${ClassName}Entity;
+import ${entityClassName};
 import ${package}.${moduleName}.mapper.${ClassName}Mapper;
 import ${package}.${moduleName}.service.${ClassName}Service;
 import org.springframework.stereotype.Service;
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import ${package}.${moduleName}.entity.${ChildClassName}Entity;
+import ${entityPackage}.${ChildClassName}Entity;
 import ${package}.${moduleName}.mapper.${ChildClassName}Mapper;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;

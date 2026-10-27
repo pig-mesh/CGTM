@@ -1,3 +1,16 @@
+## 开关：按属性类型决定开/关的值，Boolean 用 true/false，整型用 1/0，其余用 '1'/'0'
+#macro(switchValues $f)
+#if($f.attrType == 'Boolean')
+#set($switchOn = 'true')
+#set($switchOff = 'false')
+#elseif($f.attrType == 'Integer' || $f.attrType == 'Long' || $f.attrType == 'Short')
+#set($switchOn = '1')
+#set($switchOff = '0')
+#else
+#set($switchOn = "'1'")
+#set($switchOff = "'0'")
+#end
+#end
 #set($permissionPrefix = "${moduleName}_${functionName}")
 #set($permissionPrefix = $permissionPrefix.toLowerCase())
 #set($allFields = [])
@@ -24,8 +37,12 @@
 #set($needsSwitch = false)
 #set($hasDuplicate = false)
 #set($hasValidation = false)
+#set($hasOrg = false)
 #foreach($field in $allFields)
 #set($void = $types.add($field.formType))
+#if($field.formType.startsWith('org-'))
+#set($hasOrg = true)
+#end
 #if($field.formType == 'select' || $field.formType == 'radio' || $field.formType == 'checkbox')
 #if($field.fieldDict)
 #set($hasDictControls = true)
@@ -33,9 +50,9 @@
 #set($needsInput = true)
 #end
 #end
-#if($field.attrType == 'Boolean')
+#if($field.attrType == 'Boolean' || $field.formType == 'switch')
 #set($needsSwitch = true)
-#elseif($field.formType != 'select' && $field.formType != 'radio' && $field.formType != 'checkbox' && $field.formType != 'textarea' && $field.formType != 'upload-img' && $field.formType != 'upload-file' && $field.formType != 'editor')
+#elseif(!$field.formType.startsWith('org-') && $field.formType != 'select' && $field.formType != 'radio' && $field.formType != 'checkbox' && $field.formType != 'textarea' && $field.formType != 'upload-img' && $field.formType != 'upload-file' && $field.formType != 'editor')
 #set($needsInput = true)
 #end
 #if($field.formValidator == 'duplicate')
@@ -45,6 +62,9 @@
 #end
 #end
 import { useState } from 'react'
+#if($hasOrg)
+import { OrgSelect } from '@/components/common/org'
+#end
 import { addObj, putObj,#if($hasDuplicate) getObj,#end type ${ClassName}Record#if($ChildClassName), delChildObj#end } from '@/api/${moduleName}/${functionName}'
 import { useOperation } from '@/lib/common/use-operation'
 #if($ChildClassName)
@@ -106,7 +126,10 @@ const patterns: Record<string, RegExp> = {
                 // 保留 ManagedField 的失焦与错误提示关联。
                 void onOpenChange
                 void controlProps
-#if($field.formType == 'checkbox' && $field.fieldDict)
+#if($field.formType.startsWith('org-'))
+#set($orgType = $field.formType.replace('org-', '').replace('-multiple', ''))
+                return <OrgSelect valueType='item' type='${orgType}' multiple={#if($field.formType.endsWith('-multiple'))true#else false#end} value={value} onChange={change} triggerProps={controlProps} onOpenChange={onOpenChange} label='${field.fieldComment}' />
+#elseif($field.formType == 'checkbox' && $field.fieldDict)
                 return <DictSelect multiple type='$!{field.fieldDict}' value={Array.isArray(value) ? value.map(String) : []} onChange={change} triggerProps={controlProps} onOpenChange={onOpenChange} label='${field.fieldComment}' />
 #elseif(($field.formType == 'select' || $field.formType == 'radio') && $field.fieldDict)
                 return <DictSelect type='$!{field.fieldDict}' value={String(value ?? '')} onChange={(next) => change(#if($field.attrType == 'Integer' || $field.attrType == 'Double')next === '' ? null : Number(next)#else next#end)} triggerProps={controlProps} onOpenChange={onOpenChange} label='${field.fieldComment}' #if($field.formType == 'radio')presentation='toggle'#end />
@@ -120,6 +143,9 @@ const patterns: Record<string, RegExp> = {
                 return <FilePicker files={String(value ?? '').split(',').filter(Boolean).map((url) => ({ url, name: url.split('/').pop() }))} onChange={(files) => change(files.map((file) => file.url).join(','))} disabled={operation.busy} />
 #elseif($field.formType == 'editor')
                 return <RichTextEditor value={String(value ?? '')} onChange={change} disabled={operation.busy} label='${field.fieldComment}' />
+#elseif($field.formType == 'switch')
+#switchValues($field)
+                return <Switch {...controlProps} checked={String(value) === String($switchOn)} onCheckedChange={(checked) => change(checked ? $switchOn : $switchOff)} />
 #elseif($field.attrType == 'Boolean')
                 return <Switch {...controlProps} checked={value === true} onCheckedChange={change} />
 #else

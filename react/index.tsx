@@ -1,3 +1,16 @@
+## 开关：按属性类型决定开/关的值，Boolean 用 true/false，整型用 1/0，其余用 '1'/'0'
+#macro(switchValues $f)
+#if($f.attrType == 'Boolean')
+#set($switchOn = 'true')
+#set($switchOff = 'false')
+#elseif($f.attrType == 'Integer' || $f.attrType == 'Long' || $f.attrType == 'Short')
+#set($switchOn = '1')
+#set($switchOff = '0')
+#else
+#set($switchOn = "'1'")
+#set($switchOff = "'0'")
+#end
+#end
 #set($permissionPrefix = "${moduleName}_${functionName}")
 #set($permissionPrefix = $permissionPrefix.toLowerCase())
 import { useState } from 'react'
@@ -11,11 +24,15 @@ import { usePageSelection } from '@/lib/hooks/use-page-selection'
 #set($queryInput = false)
 #set($queryDict = false)
 #set($queryDate = false)
+#set($queryRange = false)
 #foreach($field in $queryList)
 #if($field.queryFormType == 'select' && $field.fieldDict)
 #set($queryDict = true)
 #elseif($field.queryFormType == 'date' || $field.queryFormType == 'datetime')
 #set($queryDate = true)
+#elseif($field.queryFormType == 'daterange' || $field.queryFormType == 'datetimerange')
+#set($queryDate = true)
+#set($queryRange = true)
 #else
 #set($queryInput = true)
 #end
@@ -49,6 +66,19 @@ function DictionaryValue({ type, value }: { type: string; value: string | number
   const query = useDict(type)
   return <DictTag options={query.data || []} value={value} />
 }
+#end
+#if($queryRange)
+// 日期范围：起止都选了才拼出后端的 xxxRange，逗号分隔由 Spring 绑定为 String[]
+function withRange(search: Record<string, string>, key: string, part: 'Begin' | 'End', value: string) {
+  const next = { ...search, [key + part]: value }
+  const begin = next[key + 'Begin']
+  const end = next[key + 'End']
+  if (begin && end) next[key + 'Range'] = begin + ',' + end
+  else delete next[key + 'Range']
+  return next
+}
+const toDateTime = (value: string) => value ? value.replace('T', ' ') + (value.length === 16 ? ':00' : '') : ''
+
 #end
 export default function ${ClassName}Page() {
   const permissions = useSession((s) => s.user?.permissions || [])
@@ -87,7 +117,7 @@ export default function ${ClassName}Page() {
         selectedCount={selected.length} onClearSelection={() => setSelected([])}
         filterCount={countTableFilters(filters)}
         actions={<>
-          {can('add') && <SystemActionButton action='add' disabled={operation.busy} onClick={() => setForm({})}>新增</SystemActionButton>}
+          {can('add') && <SystemActionButton action='add' disabled={operation.busy} onClick={() => setForm({#foreach($field in $formList)#if($field.formType == 'switch')#switchValues($field) ${field.attrName}: $switchOff,#end#end })}>新增</SystemActionButton>}
           {can('del') && <SystemActionButton action='delete' variant='outline' disabled={operation.busy || query.isFetching || !!query.error || !selected.length} onClick={() => remove(selected)}>批量删除</SystemActionButton>}
         </>}
         search={<form className='flex flex-wrap gap-2' onSubmit={(event) => {
@@ -98,12 +128,17 @@ export default function ${ClassName}Page() {
           if (current === 1 && JSON.stringify(filters) === JSON.stringify(search)) void refresh()
         }}>
 #foreach($field in $queryList)
+#if($field.formType.startsWith('org-'))#set($queryKey = "${field.attrName}Keyword")#else#set($queryKey = $field.attrName)#end
 #if($field.queryFormType == 'select' && $field.fieldDict)
           <DictSelect type='${field.fieldDict}' label='${field.fieldComment}' placeholder='${field.fieldComment}' all value={search.${field.attrName} ?? ''} onChange={(value) => setSearch({ ...search, ${field.attrName}: value })} />
+#elseif($field.queryFormType == 'daterange' || $field.queryFormType == 'datetimerange')
+#set($rangeType = "#if($field.queryFormType == 'datetimerange')datetime-local#{else}date#end")
+          <SearchDateInput label='${field.fieldComment}起' type='${rangeType}' value={(search.${field.attrName}Begin ?? '').replace(' ', 'T')} onChange={(event) => setSearch(withRange(search, '${field.attrName}', 'Begin', #if($field.queryFormType == 'datetimerange')toDateTime(event.target.value)#{else}event.target.value#end))} />
+          <SearchDateInput label='${field.fieldComment}止' type='${rangeType}' value={(search.${field.attrName}End ?? '').replace(' ', 'T')} onChange={(event) => setSearch(withRange(search, '${field.attrName}', 'End', #if($field.queryFormType == 'datetimerange')toDateTime(event.target.value)#{else}event.target.value#end))} />
 #elseif($field.queryFormType == 'date' || $field.queryFormType == 'datetime')
           <SearchDateInput label='${field.fieldComment}' type='#if($field.queryFormType == "datetime")datetime-local#{else}date#end' value={(search.${field.attrName} ?? '').replace(' ', 'T')} onChange={(event) => setSearch({ ...search, ${field.attrName}: event.target.value.replace('T', ' ') })} />
 #else
-          <Input className='w-48' aria-label='${field.fieldComment}' placeholder='${field.fieldComment}' value={search.${field.attrName} ?? ''} onChange={(event) => setSearch({ ...search, ${field.attrName}: event.target.value })} />
+          <Input className='w-48' aria-label='${field.fieldComment}' placeholder='${field.fieldComment}' value={search.${queryKey} ?? ''} onChange={(event) => setSearch({ ...search, ${queryKey}: event.target.value })} />
 #end
 #end
           <SystemActionButton action='search' type='submit' variant='outline'>查询</SystemActionButton>
@@ -116,7 +151,8 @@ export default function ${ClassName}Page() {
         selectionDisabled={query.isFetching || operation.busy}
         columns={[
 #foreach($field in $gridList)
-          { label: '${field.fieldComment}', width: 180, cell: (row) => #if($field.fieldDict)<DictionaryValue type='${field.fieldDict}' value={row.${field.attrName} ?? ''} />#else String(row.${field.attrName} ?? '')#end },
+#switchValues($field)
+          { label: '${field.fieldComment}', width: 180, cell: (row) => #if($field.formType.startsWith('org-'))(row.${field.attrName} ?? []).map((item) => item.name).join('、')#elseif($field.fieldDict)<DictionaryValue type='${field.fieldDict}' value={row.${field.attrName} ?? ''} />#elseif($field.formType == 'switch')(String(row.${field.attrName}) === String($switchOn) ? '是' : '否')#else String(row.${field.attrName} ?? '')#end },
 #end
           { label: '操作', width: 180, truncate: false, cell: (row) => <SystemActionGroup>
             {can('edit') && <SystemActionButton action='edit' compact size='sm' variant='ghost' disabled={operation.busy} onClick={() => operation.run(async () => {

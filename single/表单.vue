@@ -1,7 +1,39 @@
+## 有字典字段时才导入 useDict
+#set($hasDictField = false)
+#foreach($field in $formList)
+#if($field.fieldDict)
+#set($hasDictField = true)
+#end
+#end
+#set($hasDuplicate = false)
+#foreach($field in $formList)
+#if($field.formValidator == 'duplicate')
+#set($hasDuplicate = true)
+#end
+#end
+## 开关：按属性类型决定开/关的值，Boolean 用 true/false，整型用 1/0，其余用 '1'/'0'
+#macro(switchValues $f)
+#if($f.attrType == 'Boolean')
+#set($switchOn = 'true')
+#set($switchOff = 'false')
+#elseif($f.attrType == 'Integer' || $f.attrType == 'Long' || $f.attrType == 'Short')
+#set($switchOn = '1')
+#set($switchOff = '0')
+#else
+#set($switchOn = "'1'")
+#set($switchOff = "'0'")
+#end
+#end
+#set($hasOrg = false)
+#foreach($field in $formList)
+#if($field.formType.startsWith('org-'))
+#set($hasOrg = true)
+#end
+#end
 <template>
   <el-dialog :title="form.${pk.attrName} ? '编辑' : '新增'" v-model="visible"
     :close-on-click-modal="false" draggable>
-    <el-form ref="dataFormRef" :model="form" :rules="dataRules" formDialogRef label-width="90px" v-loading="loading">
+    <el-form ref="dataFormRef" :model="form" :rules="dataRules" label-width="90px" v-loading="loading">
       <el-row :gutter="24">
 #foreach($field in $formList)
 #if($field.attrName != ${pk.attrName})
@@ -10,7 +42,19 @@
 #elseif($formLayout == 2)
         <el-col :span="12" class="mb20">
 #end
-#if($field.formType == 'text')
+#if($field.formType.startsWith('org-'))
+#set($orgType = $field.formType.replace('org-', '').replace('-multiple', ''))
+          <el-form-item label="${field.fieldComment}" prop="${field.attrName}">
+            <OrgSelect v-model="form.${field.attrName}" value-type="item" type="${orgType}" :multiple="#if($field.formType.endsWith('-multiple'))true#else false#end" label="${field.fieldComment}" :disabled="loading" />
+          </el-form-item>
+        </el-col>
+#elseif($field.formType == 'switch')
+#switchValues($field)
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
+            <el-switch :model-value="String(form.${field.attrName}) === String($switchOn)" @change="(checked) => (form.${field.attrName} = checked ? $switchOn : $switchOff)" />
+          </el-form-item>
+        </el-col>
+#elseif($field.formType == 'text')
           <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
             <el-input v-model="form.${field.attrName}" placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end"/>
           </el-form-item>
@@ -64,6 +108,16 @@
             <el-date-picker type="datetime" placeholder="请选择#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" v-model="form.${field.attrName}" :value-format="dateTimeStr"></el-date-picker>
           </el-form-item>
         </el-col>
+#elseif($field.formType == 'daterange')
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
+            <el-date-picker type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" v-model="form.${field.attrName}" :value-format="dateStr"></el-date-picker>
+          </el-form-item>
+        </el-col>
+#elseif($field.formType == 'datetimerange')
+          <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
+            <el-date-picker type="datetimerange" range-separator="至" start-placeholder="开始时间" end-placeholder="结束时间" v-model="form.${field.attrName}" :value-format="dateTimeStr"></el-date-picker>
+          </el-form-item>
+        </el-col>
 #elseif($field.formType == 'number')
           <el-form-item label="#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end" prop="${field.attrName}">
             <el-input-number :min="1" :max="1000" v-model="form.${field.attrName}" placeholder="请输入#if(${field.fieldComment})${field.fieldComment}#else${field.attrName}#end"></el-input-number>
@@ -104,11 +158,22 @@
 </template>
 
 <script setup lang="ts" name="${ClassName}Dialog">
+#if($hasOrg)
+import OrgSelect from '/@/components/OrgSelector/OrgSelect.vue';
+import type { OrgRef } from '/@/types/org';
+#end
 // ========== 1. 导入语句 ==========
+#if($hasDictField)
 import { useDict } from '/@/hooks/dict';
+#end
+#foreach($field in $formList)
+#if($field.formValidator && $field.formValidator != 'duplicate')
 import { rule } from '/@/utils/validate';
+#break
+#end
+#end
 import { useMessage } from "/@/hooks/message";
-import { getObj, addObj, putObj, validateExist } from '/@/api/${moduleName}/${functionName}';
+import { getObj, addObj, putObj#if($hasDuplicate), validateExist#end } from '/@/api/${moduleName}/${functionName}';
 
 // ========== 2. 组件定义 ==========
 // 定义组件事件
@@ -128,7 +193,12 @@ const form = reactive({
 #foreach($field in $formList)
 #if($field.formType == 'number')
   ${field.attrName}: 0, // ${field.fieldComment}
-#elseif($field.formType == 'checkbox')
+#elseif($field.formType.startsWith('org-'))
+  ${field.attrName}: [] as OrgRef[], // ${field.fieldComment}
+#elseif($field.formType == 'switch')
+#switchValues($field)
+  ${field.attrName}: $switchOff, // ${field.fieldComment}
+#elseif($field.formType == 'checkbox' || $field.formType == 'daterange' || $field.formType == 'datetimerange')
   ${field.attrName}: [], // ${field.fieldComment}
 #else
   ${field.attrName}: '', // ${field.fieldComment}
@@ -138,7 +208,7 @@ const form = reactive({
 
 // ========== 4. 字典数据处理 ==========
 #set($fieldDict=[])
-#foreach($field in $gridList)
+#foreach($field in $formList)
 #if($field.fieldDict)
 #set($void=$fieldDict.add($field.fieldDict))
 #end
@@ -151,7 +221,9 @@ const { $dict.format($fieldDict) } = useDict($dict.quotation($fieldDict));
 // ========== 5. 表单校验规则 ==========
 const dataRules = ref({
 #foreach($field in $formList)
-#if($field.formRequired == '1' && $field.formValidator == 'duplicate')
+#if($field.formType.startsWith('org-') && $field.formRequired == '1')
+  ${field.attrName}: [{ required: true, type: 'array', min: 1, message: '${field.fieldComment}不能为空', trigger: 'change' }],
+#elseif($field.formRequired == '1' && $field.formValidator == 'duplicate')
   ${field.attrName}: [
     { required: true, message: '${field.fieldComment}不能为空', trigger: 'blur' },
     {
@@ -170,6 +242,17 @@ const dataRules = ref({
 #elseif($field.formRequired == '1')
   ${field.attrName}: [
     { required: true, message: '${field.fieldComment}不能为空', trigger: 'blur' }
+  ],
+#elseif($field.formValidator == 'duplicate')
+  ${field.attrName}: [
+    {
+      validator: (rule: any, value: any, callback: any) => {
+        if (value === undefined || value === null || String(value).trim() === '') return callback();
+        // 重复性校验（编辑时跳过）
+        validateExist(rule, value, callback, form.${pk.attrName} !== '');
+      },
+      trigger: 'blur',
+    }
   ],
 #elseif($field.formValidator)
   ${field.attrName}: [
